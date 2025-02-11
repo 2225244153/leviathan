@@ -1,0 +1,49 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "GHBaseAIController.h"
+
+#include "GHBaseMonster.h"
+
+
+// Sets default values
+AGHBaseAIController::AGHBaseAIController() : BaseMonster(nullptr)
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+// Called when the game starts or when spawned
+void AGHBaseAIController::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+// Called every frame
+void AGHBaseAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AGHBaseAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	BaseMonster = Cast<AGHBaseMonster>(InPawn);
+	if (BaseMonster == nullptr || BaseMonster->BehaviorTreeAsset == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GH---Monter BehaivourTree is NULL!!!"));
+		return;
+	}
+	
+	RunBehaviorTree(BaseMonster->BehaviorTreeAsset);
+}
+
+void AGHBaseAIController::OnUnPossess()
+{
+	Super::OnUnPossess();
+
+	BaseMonster = nullptr;
+}
+
