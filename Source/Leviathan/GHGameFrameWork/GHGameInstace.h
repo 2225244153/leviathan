@@ -17,7 +17,8 @@ class LEVIATHAN_API UGHGameInstace : public UGameInstance
 public:
 	UGHGameInstace();
 	~UGHGameInstace();
-	
+
+	void GHInit();
 protected:
 	virtual void StartGameInstance() override;
 	virtual void Shutdown() override;

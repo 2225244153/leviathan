@@ -8,6 +8,35 @@
 
 class AGHBaseMonster;
 
+/*
+ * 怪物状态
+ */
+UENUM(BlueprintType)
+enum class EAIMonsterState : uint8
+{
+	E_AIMonsterState_None		UMETA(DisplayName = "None"),
+	E_AIMonsterState_Init		UMETA(DisplayName = "Init"),
+	E_AIMonsterState_Alert		UMETA(DisplayName = "Alert"),
+	E_AIMonsterState_Battle		UMETA(DisplayName = "Battle"),
+	E_AIMonsterState_Find		UMETA(DisplayName = "Find"),
+	E_AIMonsterState_Back		UMETA(DisplayName = "Back"),
+	E_AIMonsterState_Death		UMETA(DisplayName = "Death"),
+};
+
+/*
+ * 怪物战斗状态
+ */
+UENUM(BlueprintType)
+enum class EAIMonsterBattleState : uint8
+{
+	E_AIMonsterState_BattleNone		UMETA(DisplayName = "BattleNone"),
+	E_AIMonsterState_BattlePursue	UMETA(DisplayName = "BattlePursue"),
+	E_AIMonsterState_BattleTurn		UMETA(DisplayName = "BattleTurn"),
+	E_AIMonsterState_BattleAttack	UMETA(DisplayName = "BattleAttack"),
+	E_AIMonsterState_BattlePerform	UMETA(DisplayName = "BattlePerform"),
+	E_AIMonsterState_BattleHurt		UMETA(DisplayName = "BattleHurt"),
+};
+
 UCLASS()
 class LEVIATHAN_API AGHBaseAIController : public AAIController
 {

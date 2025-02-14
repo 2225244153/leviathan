@@ -22,4 +22,10 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetID();
+
+private:
+	static int32 ID;//唯一id，标识一个Character
 };

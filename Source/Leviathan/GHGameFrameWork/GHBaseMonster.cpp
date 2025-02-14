@@ -4,6 +4,7 @@
 #include "GHBaseMonster.h"
 
 #include "GHBaseAIController.h"
+#include "Leviathan/GHComponents/BattleTargetComponent.h"
 
 
 // Sets default values
@@ -26,6 +27,8 @@ AGHBaseMonster::AGHBaseMonster()
 	{
 		AIControllerClass = ((AGHBaseMonster*)AGHBaseMonster::StaticClass()->GetDefaultObject())->AIControllerClass;
 	}
+
+	TargetComponent = CreateDefaultSubobject<UBattleTargetComponent>(TEXT("TargetComponent"));
 }
 
 // Called when the game starts or when spawned
