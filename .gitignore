@@ -40,7 +40,7 @@
 !Plugins/Unlua/Source/**/*.lib
 !Plugins/Unlua/Source/**/*.dll
 Plugins/Unlua/Source/UnluaDefaultParamCollectorUbtPlugin/obj/*
-
+Plugins/Unlua/Source/UnluaDefaultParamCollectorUbtPlugin/UnLuaDefaultParamCollectorUbtPlugin.ubtplugin.csproj.props
 
 # .idea
 Content/Python/.idea/*
