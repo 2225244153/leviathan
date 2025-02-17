@@ -13,4 +13,6 @@ UCLASS()
 class LEVIATHAN_API AGHBasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+	AGHBasePlayerController();
 };

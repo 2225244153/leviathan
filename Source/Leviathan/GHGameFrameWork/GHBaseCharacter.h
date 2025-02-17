@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Leviathan/AbilitySystem/Component/GHAbilitySystemComponent.h"
 #include "GHBaseCharacter.generated.h"
 
 UCLASS()
@@ -23,9 +24,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void InitAbilitySystemComponent(AActor* OwnerActor);
+
 	UFUNCTION(BlueprintCallable)
 	int32 GetID();
 
+	/**
+	 * @brief ASC组件
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	UGHAbilitySystemComponent* AbilitySystemComponent;
+
 private:
-	static int32 ID;//唯一id，标识一个Character
+	bool ASCInitialized = false;
+
+private:
+	static int32 ID; //唯一id，标识一个Character
 };

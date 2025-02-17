@@ -2,3 +2,8 @@
 
 
 #include "GHBasePlayerController.h"
+
+AGHBasePlayerController::AGHBasePlayerController()
+{
+	bShowMouseCursor = false;
+}

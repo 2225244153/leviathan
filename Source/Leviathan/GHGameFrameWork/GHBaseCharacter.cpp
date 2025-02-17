@@ -15,13 +15,23 @@ AGHBaseCharacter::AGHBaseCharacter()
 	{
 		ID++;
 	}
+
+	// Ability System Component.
+	AbilitySystemComponent = CreateDefaultSubobject<UGHAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
 
 // Called when the game starts or when spawned
 void AGHBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ENetRole LocalRole = GetLocalRole();
+	if (LocalRole >= ROLE_AutonomousProxy)
+	{
+		InitAbilitySystemComponent(this);
+	}
 }
 
 // Called every frame
@@ -35,3 +45,21 @@ int32 AGHBaseCharacter::GetID()
 	return ID;
 }
 
+void AGHBaseCharacter::InitAbilitySystemComponent(AActor* OwnerActor)
+{
+	// 防止重复初始化
+	if (ASCInitialized)
+	{
+		return;
+	}
+	AbilitySystemComponent->InitAbilityActorInfo(OwnerActor, this);
+
+	ENetRole LocalRole = GetLocalRole();
+	if (LocalRole == ROLE_Authority)
+	{
+		AbilitySystemComponent->InitAttributeSet();
+		AbilitySystemComponent->InitAbility();
+	}
+	
+	ASCInitialized = true;
+}

@@ -107,4 +107,3 @@ void AGHBasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGHBasePlayer::Look);
 	}
 }
-
