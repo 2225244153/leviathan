@@ -36,7 +36,7 @@
 *.ipa
 
 # Unlua
-Plugins/Unlua/Source/UnluaDefaultParamCollectorUbtPlugin/*
+!Plugins/Unlua/Source/UnluaDefaultParamCollectorUbtPlugin/*
 !Plugins/Unlua/Source/**/*.lib
 !Plugins/Unlua/Source/**/*.dll
 
