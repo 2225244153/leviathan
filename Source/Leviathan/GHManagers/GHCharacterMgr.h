@@ -44,7 +44,9 @@ public:
 	void GetAllMonsters(TArray<AGHBaseMonster*>& allMonsters);
 	UFUNCTION(BlueprintCallable)
 	AGHBaseCharacter* GetCharacter(int32 id);
-	
+
+	void RegisterCharacter(AGHBaseCharacter* character);
+	void UnregisterCharacter(AGHBaseCharacter* character);
 private:
 	static UGHGameInstace* Inst;
 	

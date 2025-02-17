@@ -44,5 +44,6 @@ private:
 	bool ASCInitialized = false;
 
 private:
-	static int32 ID; //唯一id，标识一个Character
+	static int32 IDFlag;
+	int32 ID; //唯一id，标识一个Character
 };
