@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Leviathan/AbilitySystem/Component/GHAbilitySystemComponent.h"
 #include "GHBaseCharacter.generated.h"
 
 UCLASS()
-class LEVIATHAN_API AGHBaseCharacter : public ACharacter
+class LEVIATHAN_API AGHBaseCharacter : public ACharacter,public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -31,6 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetID();
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
 	/**
 	 * @brief ASC组件
 	 */

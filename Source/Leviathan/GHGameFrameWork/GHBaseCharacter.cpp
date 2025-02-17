@@ -45,6 +45,11 @@ int32 AGHBaseCharacter::GetID()
 	return ID;
 }
 
+UAbilitySystemComponent* AGHBaseCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void AGHBaseCharacter::InitAbilitySystemComponent(AActor* OwnerActor)
 {
 	// 防止重复初始化
