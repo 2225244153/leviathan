@@ -3,7 +3,7 @@
 
 #include "GHBaseCharacter.h"
 
-int32 AGHBaseCharacter::ID = 0;
+int32 AGHBaseCharacter::IDFlag = 0;
 
 // Sets default values
 AGHBaseCharacter::AGHBaseCharacter()
@@ -13,7 +13,8 @@ AGHBaseCharacter::AGHBaseCharacter()
 
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
-		ID++;
+		IDFlag++;
+		ID = IDFlag;
 	}
 
 	// Ability System Component.

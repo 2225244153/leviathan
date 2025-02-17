@@ -16,4 +16,22 @@ class LEVIATHAN_API AGHGameModeBase : public AGameModeBase
 
 public:
 	AGHGameModeBase();
+
+	FTimerHandle TickTimerHandle;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+	void TickTimer();
+
+	UFUNCTION(BlueprintCallable, Exec)
+	void GHDebugPauseAI(int32 active);
+	/*
+	 *	debug怪物
+	 *	@param type 1-显示怪物警戒范围 2-显示怪物跟随范围
+	 */
+	UFUNCTION(BlueprintCallable, Exec)
+	void GHDebugAIMonster(int32 type, int32 active);
+
+	bool bDebugTargetRange;//怪物警戒范围
+	bool bDebugAIPurse;//怪物跟随范围
 };

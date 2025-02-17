@@ -11,6 +11,7 @@ class AGHBaseCharacter;
 /*
  * 查找战斗目标组件，默认该组件只绑定BaseMonster，只会查找BasePlayer为目标
  * 角色查找怪物为攻击目标不支持 todo
+ * 暂时不支持切换目标的逻辑
  * @company GH
  * @author hsp
  * @date 2025-2-14
@@ -34,6 +35,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AGHBaseCharacter* GetBattleTarget();
+	//todo监听受击直接设置攻击者为目标
+	
 	UFUNCTION(BlueprintCallable)
 	void ResetBattleTarget();
 
@@ -41,6 +44,10 @@ public:
 	 *	寻找目标
 	 */
 	void FindBattleTarget();
+	/*
+	 * 判断目标是否合法 目标为空或者超过范围则为不合法
+	 */
+	bool CheckTargetValid();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
