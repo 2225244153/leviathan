@@ -7,13 +7,15 @@
 #include "AbilitySystemInterface.h"
 #include "EnhancedInputComponent.h"
 
-void FDarwinInputActionBinding::Init(ACharacter* Character, UEnhancedInputComponent* InEnhancedInputComponent)
+void FGHInputActionBinding::Init(ACharacter* Character, UEnhancedInputComponent* InEnhancedInputComponent)
 {
 	IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(Character);
 	check(AbilitySystemInterface);
 
 	UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
 	check(AbilitySystemComponent);
+
+	BindingHandle = 0;
 
 	if (!EnhancedInputComponent)
 	{
@@ -42,7 +44,7 @@ void FDarwinInputActionBinding::Init(ACharacter* Character, UEnhancedInputCompon
 	}
 }
 
-void FDarwinInputActionBinding::BindInputAction()
+void FGHInputActionBinding::BindInputAction()
 {
 	if (BindingHandle == 0)
 	{
@@ -51,8 +53,10 @@ void FDarwinInputActionBinding::BindInputAction()
 	}
 }
 
-void FDarwinInputActionBinding::RemoveBinding()
+void FGHInputActionBinding::RemoveBinding()
 {
+	EnhancedInputComponent->RemoveBindingByHandle(BindingHandle);
+	BindingHandle = 0;
 }
 
 void UGHInputAction::OnInputAction(const FInputActionValue& InputActionValue)

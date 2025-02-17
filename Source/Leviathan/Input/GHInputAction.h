@@ -10,7 +10,7 @@
 #include "GHInputAction.generated.h"
 
 USTRUCT(BlueprintType)
-struct FDarwinInputActionBinding
+struct FGHInputActionBinding
 {
 	GENERATED_BODY()
 
@@ -60,7 +60,6 @@ public:
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
 
-	UPROPERTY()
 	int32 BindingHandle = 0;
 
 	void Init(ACharacter* Character, UEnhancedInputComponent* EnhancedInputComponent);
@@ -76,7 +75,7 @@ class UGHInputActionBindingList : public UDataAsset
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FDarwinInputActionBinding> InputActionBindingList;
+	TArray<FGHInputActionBinding> InputActionBindingList;
 };
 
 /**

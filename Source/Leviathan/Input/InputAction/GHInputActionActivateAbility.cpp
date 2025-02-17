@@ -10,7 +10,11 @@ void UGHInputActionActivateAbility::OnInputAction(const FInputActionValue& input
 	Super::OnInputAction(input_action_value);
 
 	TSubclassOf<UGameplayAbility> GameplayAbility = AbilitySystemComponent->GetAbilityByInputTag(InputTag);
-	AbilitySystemComponent->TryActivateAbilityByClass(GameplayAbility);
+	bool bIsSuccess = AbilitySystemComponent->TryActivateAbilityByClass(GameplayAbility);
+	if (!bIsSuccess)
+	{
+		return;
+	}
 }
 
 void UGHInputActionActivateAbility::Init(ACharacter* InCharacter)

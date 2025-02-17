@@ -1,27 +1,27 @@
 // Copyright Relink Games, Inc. All Rights Reserved. 
 
 
-#include "GHAssetManager.h"
+#include "GHAssetMgr.h"
 #include "AbilitySystemGlobals.h"
 #include "Leviathan/AbilitySystem/GHGameplayTags.h"
 
-UGHAssetManager::UGHAssetManager()
+UGHAssetMgr::UGHAssetMgr()
 {
 }
 
-UGHAssetManager& UGHAssetManager::Get()
+UGHAssetMgr& UGHAssetMgr::Get()
 {
 	check(GEngine);
 
-	if (UGHAssetManager *singleton = Cast<UGHAssetManager>(GEngine->AssetManager))
+	if (UGHAssetMgr *singleton = Cast<UGHAssetMgr>(GEngine->AssetManager))
 	{
 		return *singleton;
 	}
 
-	return *NewObject<UGHAssetManager>();
+	return *NewObject<UGHAssetMgr>();
 }
 
-void UGHAssetManager::StartInitialLoading()
+void UGHAssetMgr::StartInitialLoading()
 {
     UGameplayTagsManager &manager = UGameplayTagsManager::Get();
 

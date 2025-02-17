@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/AssetManager.h"
 #include "UObject/Object.h"
-#include "GHAssetManager.generated.h"
+#include "GHAssetMgr.generated.h"
 
 /**
  *
@@ -13,12 +13,12 @@
  * 这个类在DefaultEngine.ini文件中通过AssetManagerClassName字段指定
  */
 UCLASS()
-class LEVIATHAN_API UGHAssetManager : public UAssetManager
+class LEVIATHAN_API UGHAssetMgr : public UAssetManager
 {
 	GENERATED_BODY()
 public:
-	UGHAssetManager();
-	static UGHAssetManager& Get();
+	UGHAssetMgr();
+	static UGHAssetMgr& Get();
 
 public:
 	virtual void StartInitialLoading() override;
