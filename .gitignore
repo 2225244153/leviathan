@@ -36,7 +36,8 @@
 *.ipa
 
 # Unlua
-Plugins/Unlua/Source/UnluaDefaultParamCollectorUbtPlugin/*
+!Plugins/Unlua/Source/UnluaDefaultParamCollectorUbtPlugin/*
+!Plugins/Unlua/Source/**/*
 
 # .idea
 Content/Python/.idea/*
