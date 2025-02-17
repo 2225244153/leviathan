@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "Leviathan/Input/GHInputAction.h"
 #include "GHInputActionActivateAbility.generated.h"
 
+class UGHAbilitySystemComponent;
 /**
  * 
  */
@@ -18,4 +20,7 @@ public:
 
 	virtual void Init(ACharacter* InCharacter) override;
 
+private:
+	UPROPERTY()
+	UGHAbilitySystemComponent* AbilitySystemComponent;
 };

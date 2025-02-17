@@ -23,10 +23,10 @@ protected:
 
 private:
 	void InitInputAction(APlayerController* InController);
-	
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "InputAction")
-    TObjectPtr<UGHInputActionBindingList> InputActionBindings;
+	TObjectPtr<UGHInputActionBindingList> InputActionBindings;
 
 	UPROPERTY()
 	APlayerController* PlayerController;

@@ -6,6 +6,16 @@
 #include "AbilitySystemComponent.h"
 #include "GHAbilitySystemComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FInputActionAbilityMap
+{
+	GENERATED_BODY()
+
+	//技能Map
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "InputAction")
+	TMap<FGameplayTag, TSubclassOf<UGHGameplayAbility>> InputActionMap;
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(LogGHAbilitySystemComponent, Log, All)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -17,7 +27,6 @@ public:
 	// Sets default values for this component's properties
 	UGHAbilitySystemComponent();
 
-public:
 	UFUNCTION(BlueprintCallable, meta=(DisplayName = "CancelAbilityHandle"))
 	void K2_CancelAbilityHandle(const FGameplayAbilitySpecHandle AbilitySpecHandle);
 
@@ -73,7 +82,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UGameplayAbility* FindGameplayAbilityByHandle(const FGameplayAbilitySpecHandle& handle);
-	
+
 	UFUNCTION(BlueprintCallable)
 	bool InitAttributeSet();
 
@@ -82,8 +91,14 @@ public:
 	 */
 	bool InitAbility();
 
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<UGHGameplayAbility> GetAbilityByInputTag(FGameplayTag InputTag);
+
 private:
-	bool Give(TSubclassOf<UGHGameplayAbility> AbilityClass,int32 SkillLevel,int32 InputID);
+	bool Give(TSubclassOf<UGHGameplayAbility> AbilityClass, int32 SkillLevel, int32 InputID);
+
+	//某些逻辑需要延迟到AbilitySystemComponent初始化好以后，这里提供时机
+	void OnAbilitySystemComponentReady();
 
 public:
 	/*
@@ -97,4 +112,8 @@ public:
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Attribute")
 	TObjectPtr<UGHAttributeSetDesc> AttributeSetDefault;
+
+	// 表征技能系统
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="")
+	FInputActionAbilityMap AbilityMap;
 };

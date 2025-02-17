@@ -180,19 +180,35 @@ bool UGHAbilitySystemComponent::InitAbility()
 	return false;
 }
 
+TSubclassOf<UGHGameplayAbility> UGHAbilitySystemComponent::GetAbilityByInputTag(FGameplayTag InputTag)
+{
+	TSubclassOf<UGHGameplayAbility>* GameplayAbilityClass = AbilityMap.InputActionMap.Find(InputTag);
+	if (!GameplayAbilityClass)
+	{
+		ensureMsgf(false,TEXT("No Ability Class Exist"));
+		return nullptr;
+	}
+
+	return *GameplayAbilityClass;
+}
+
 bool UGHAbilitySystemComponent::Give(TSubclassOf<UGHGameplayAbility> AbilityClass, int32 SkillLevel, int32 InputID)
 {
 	check(AbilityClass);
 	FGameplayAbilitySpec AbilitySpec = BuildAbilitySpecFromClass(
 		AbilityClass, SkillLevel, InputID);
 	FGameplayAbilitySpecHandle SpecHandle = GiveAbility(AbilitySpec);
-	
-	if(!SpecHandle.IsValid())
+
+	if (!SpecHandle.IsValid())
 	{
 		return false;
 	}
-		
+
 	return true;
+}
+
+void UGHAbilitySystemComponent::OnAbilitySystemComponentReady()
+{
 }
 
 void UGHAbilitySystemComponent::AddLooseTag(const FGameplayTag& tag)

@@ -2,13 +2,24 @@
 
 
 #include "GHInputActionActivateAbility.h"
+#include "../../AbilitySystem/Component/GHAbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
 
 void UGHInputActionActivateAbility::OnInputAction(const FInputActionValue& input_action_value)
 {
 	Super::OnInputAction(input_action_value);
+
+	TSubclassOf<UGameplayAbility> GameplayAbility = AbilitySystemComponent->GetAbilityByInputTag(InputTag);
+	AbilitySystemComponent->TryActivateAbilityByClass(GameplayAbility);
 }
 
 void UGHInputActionActivateAbility::Init(ACharacter* InCharacter)
 {
 	Super::Init(InCharacter);
+
+	IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(InCharacter);
+	if (AbilitySystemInterface)
+	{
+		AbilitySystemComponent = Cast<UGHAbilitySystemComponent>(AbilitySystemInterface->GetAbilitySystemComponent());
+	}
 }

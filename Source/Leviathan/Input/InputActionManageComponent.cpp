@@ -24,12 +24,13 @@ void UInputActionManageComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Character = Cast<ACharacter>(GetOwner());
-	check(Character);
+	if (GetOwnerRole() == ENetRole::ROLE_AutonomousProxy)
+	{
+		Character = Cast<ACharacter>(GetOwner());
 
-	PlayerController = Cast<APlayerController>(Character->GetController());
-
-	InitInputAction(PlayerController);
+		PlayerController = Cast<APlayerController>(Character->GetController());
+		InitInputAction(PlayerController);
+	}
 }
 
 void UInputActionManageComponent::InitInputAction(APlayerController* InController)
