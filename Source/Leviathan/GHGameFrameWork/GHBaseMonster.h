@@ -6,6 +6,7 @@
 #include "GHBaseCharacter.h"
 #include "GHBaseMonster.generated.h"
 
+class UAIStateComponent;
 class UBattleTargetComponent;
 class UBehaviorTree;
 
@@ -32,7 +33,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
 
+	AGHBaseCharacter* GetBattleTarget();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBattleTargetComponent* TargetComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAIStateComponent* StateComponent;
 };

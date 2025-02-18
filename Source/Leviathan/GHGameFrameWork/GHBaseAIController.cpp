@@ -5,7 +5,6 @@
 
 #include "GHBaseMonster.h"
 
-
 // Sets default values
 AGHBaseAIController::AGHBaseAIController() : BaseMonster(nullptr)
 {

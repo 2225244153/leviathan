@@ -4,6 +4,7 @@
 #include "GHGameInstace.h"
 
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
+#include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
 
 UGHGameInstace::UGHGameInstace()
 {
@@ -31,6 +32,8 @@ void UGHGameInstace::StartGameInstance()
 
 void UGHGameInstace::Shutdown()
 {
+	UGHCoreDelegatesMgr::ClearDelegates();
+	
 	Super::Shutdown();
 }
 

@@ -35,6 +35,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AGHBaseCharacter* GetBattleTarget();
+	UFUNCTION(BlueprintCallable)
+	void SetBattleTarget(AGHBaseCharacter* target);
 	//todo监听受击直接设置攻击者为目标
 	
 	UFUNCTION(BlueprintCallable)
@@ -49,13 +51,33 @@ public:
 	 */
 	bool CheckTargetValid();
 
+	/*
+	 *	警戒
+	 */
+	void StartAlert();
+	void FinishAlert();
+	void UpdateAlert(float DeltaTime);
+	void SetAlertTarget(AGHBaseCharacter* alertTarget);
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
 	bool bFindBattleTarget;
+	//警戒最大值，超过最大值则设置目标进入战斗状态
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
+	int32 MaxAlertValue = 100;
+	//警戒值每秒浮动速率
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
+	float AlertFloatRatePerSecond = 20;
 	
 private:
 	UPROPERTY()
 	AGHBaseCharacter* BattleTarget;
 	UPROPERTY()
+	AGHBaseCharacter* AlertTarget;
+	UPROPERTY()
 	AGHBaseCharacter* Owner;
+
+	//是否再警戒状态
+	bool bAlert;
+	//当前警戒值
+	float CurAlertValue;
 };

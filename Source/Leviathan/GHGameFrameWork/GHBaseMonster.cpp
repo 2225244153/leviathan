@@ -4,6 +4,7 @@
 #include "GHBaseMonster.h"
 
 #include "GHBaseAIController.h"
+#include "Leviathan/GHComponents/AIStateComponent.h"
 #include "Leviathan/GHComponents/BattleTargetComponent.h"
 
 
@@ -29,6 +30,7 @@ AGHBaseMonster::AGHBaseMonster()
 	}
 
 	TargetComponent = CreateDefaultSubobject<UBattleTargetComponent>(TEXT("TargetComponent"));
+	StateComponent = CreateDefaultSubobject<UAIStateComponent>(TEXT("StateComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -49,5 +51,10 @@ void AGHBaseMonster::Tick(float DeltaTime)
 void AGHBaseMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+AGHBaseCharacter* AGHBaseMonster::GetBattleTarget()
+{
+	return TargetComponent->GetBattleTarget();
 }
 
