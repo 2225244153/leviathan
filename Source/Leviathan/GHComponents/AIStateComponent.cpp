@@ -3,6 +3,7 @@
 
 #include "BattleTargetComponent.h"
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
+#include "Leviathan/GHManagers/GHCharacterMgr.h"
 #include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
 #include "Leviathan/GHUtils/GHCommonUtils.h"
 
@@ -40,6 +41,8 @@ void UAIStateComponent::BeginPlay()
 
 	SearchTargetDelegateHandle = UGHCoreDelegatesMgr::OnBattleSearchTarget.AddUObject(this, &UAIStateComponent::OnBattleSearchTarget);
 	LoseTargetDelegateHandle = UGHCoreDelegatesMgr::OnBattleLoseTarget.AddUObject(this, &UAIStateComponent::OnBattleLoseTarget);
+	DeathDelegateHandle = UGHCoreDelegatesMgr::OnCharacterDeath.AddUObject(this, &UAIStateComponent::OnDeath);
+	HurtDelegateHandle = UGHCoreDelegatesMgr::OnCharacterHurt.AddUObject(this, &UAIStateComponent::OnHurt);
 	UGHCoreDelegatesMgr::OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
 	UGHCoreDelegatesMgr::OnFinishAlert.BindUObject(this, &UAIStateComponent::OnFinishAlert);
 }
@@ -48,6 +51,8 @@ void UAIStateComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	UGHCoreDelegatesMgr::OnBattleSearchTarget.Remove(SearchTargetDelegateHandle);
 	UGHCoreDelegatesMgr::OnBattleLoseTarget.Remove(LoseTargetDelegateHandle);
+	UGHCoreDelegatesMgr::OnCharacterDeath.Remove(DeathDelegateHandle);
+	UGHCoreDelegatesMgr::OnCharacterHurt.Remove(HurtDelegateHandle);
 	UGHCoreDelegatesMgr::OnStartAlert.Unbind();
 	UGHCoreDelegatesMgr::OnFinishAlert.Unbind();
 	
@@ -69,8 +74,14 @@ void UAIStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
-void UAIStateComponent::OnBattleSearchTarget(AGHBaseCharacter* target)
+void UAIStateComponent::OnBattleSearchTarget(int32 targetId)
 {
+	AGHBaseCharacter* target = UGHCharacterMgr::Get()->GetCharacter(targetId);
+	if (target == nullptr)
+	{
+		return;
+	}
+	
 	//AI_Monster_State_Find状态重新找到目标直接结束Finding
 	FinishFinding();
 	
@@ -102,6 +113,25 @@ void UAIStateComponent::OnFinishAlert()
 	SetState(AI_Monster_State_Init);
 }
 
+void UAIStateComponent::OnDeath(int32 sponsorId, int32 targetId)
+{
+	if (Owner->GetID() != targetId)
+	{
+		return;
+	}
+	SetState(AI_Monster_State_Death);
+}
+
+void UAIStateComponent::OnHurt(int32 sponsorId, int32 targetId)
+{
+	if (Owner->GetID() != targetId)
+	{
+		return;
+	}
+
+	SetState(AI_Monster_State_Battle_Hurt);
+}
+
 FGameplayTag UAIStateComponent::GetState()
 {
 	return TagState;
@@ -109,8 +139,20 @@ FGameplayTag UAIStateComponent::GetState()
 
 void UAIStateComponent::SetState(FGameplayTag state)
 {
+	if (TagState.IsValid())
+	{
+		FGameplayTagContainer tagContainer = TagState.GetGameplayTagParents();
+		if (tagContainer.HasTag(state))
+		{
+			return;
+		}
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("GH------UAIStateComponent::SetState: %s"), *state.ToString());
+	FGameplayTag oldTag = TagState;
 	TagState = state;
+
+	UGHCoreDelegatesMgr::OnAIStateChanged.Broadcast(oldTag, TagState);
 
 	if (state == AI_Monster_State_Find)
 	{

@@ -48,10 +48,12 @@ public:
 	/*
 	 * CoreDelegates begin
 	 */
-	void OnBattleSearchTarget(AGHBaseCharacter* target);
+	void OnBattleSearchTarget(int32 targetId);
 	void OnBattleLoseTarget(uint8 loseType);
 	void OnStartAlert();
 	void OnFinishAlert();
+	void OnDeath(int32 sponsorId, int32 targetId);
+	void OnHurt(int32 sponsorId, int32 targetId);
 	/*
 	 * CoreDelegates end
 	 */
@@ -88,5 +90,7 @@ private:
 
 	FDelegateHandle SearchTargetDelegateHandle;
 	FDelegateHandle LoseTargetDelegateHandle;
+	FDelegateHandle DeathDelegateHandle;
+	FDelegateHandle HurtDelegateHandle;
 };
 

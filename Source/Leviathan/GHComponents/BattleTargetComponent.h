@@ -47,6 +47,7 @@ public:
 	 * CoreDelegates begin
 	 */
 	void OnAIStateChanged(FGameplayTag& oldTag, FGameplayTag& newTag);
+	void OnHurt(int32 sponsorId, int32 targetId);
 	/*
 	 * CoreDelegates end
 	 */
@@ -118,4 +119,5 @@ private:
 	float CurAlertValue;
 
 	FDelegateHandle AIStateChangedDelegateHandle;
+	FDelegateHandle HurtDelegateHandle;
 };

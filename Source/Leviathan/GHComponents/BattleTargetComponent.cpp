@@ -31,11 +31,13 @@ void UBattleTargetComponent::BeginPlay()
 	Owner = Cast<AGHBaseMonster>(GetOwner());
 
 	AIStateChangedDelegateHandle = UGHCoreDelegatesMgr::OnAIStateChanged.AddUObject(this, &UBattleTargetComponent::OnAIStateChanged);
+	HurtDelegateHandle = UGHCoreDelegatesMgr::OnCharacterHurt.AddUObject(this, &UBattleTargetComponent::OnHurt);
 }
 
 void UBattleTargetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	UGHCoreDelegatesMgr::OnAIStateChanged.Remove(AIStateChangedDelegateHandle);
+	UGHCoreDelegatesMgr::OnCharacterHurt.Remove(HurtDelegateHandle);
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -81,6 +83,19 @@ void UBattleTargetComponent::OnAIStateChanged(FGameplayTag& oldTag, FGameplayTag
 	bSearchAlertTarget = !(newTag == AI_Monster_State_Find);
 }
 
+void UBattleTargetComponent::OnHurt(int32 sponsorId, int32 targetId)
+{
+	if (Owner->GetID() != targetId)
+	{
+		return;
+	}
+	AGHBaseCharacter* sponsor = UGHCharacterMgr::Get()->GetCharacter(sponsorId);
+	if (sponsor != nullptr)
+	{
+		SetBattleTarget(sponsor);
+	}
+}
+
 AGHBaseCharacter* UBattleTargetComponent::GetBattleTarget()
 {
 	return BattleTarget;
@@ -93,8 +108,13 @@ void UBattleTargetComponent::SetBattleTarget(AGHBaseCharacter* target)
 		UE_LOG(LogTemp, Warning, TEXT("GH---BattleTargetComponent::SetBattleTarget: target is null!!!"));
 		return;
 	}
+	//暂时不考虑切换目标
+	if (BattleTarget != nullptr)
+	{
+		return;
+	}
 	BattleTarget = target;
-	UGHCoreDelegatesMgr::OnBattleSearchTarget.Broadcast(BattleTarget);
+	UGHCoreDelegatesMgr::OnBattleSearchTarget.Broadcast(BattleTarget->GetID());
 }
 
 void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)

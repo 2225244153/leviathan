@@ -15,7 +15,7 @@ public:
 	/*
 	 *	BattleTargetComponent发现目标广播
 	 */
-	static TMulticastDelegate<void(AGHBaseCharacter*)> OnBattleSearchTarget;
+	static TMulticastDelegate<void(int32)> OnBattleSearchTarget;
 	/*
 	 *  BattleTargetComponent丢失目标广播
 	 */
@@ -33,4 +33,17 @@ public:
 	 *	AIStateComponent状态发生改变
 	 */
 	static TMulticastDelegate<void(FGameplayTag&, FGameplayTag&)> OnAIStateChanged;
+
+	/*
+	 *	角色受击
+	 *	@param1: 发起方id
+	 *	@param2: 受击方id
+	 */
+	static TMulticastDelegate<void(int32, int32)> OnCharacterHurt;
+	/*
+	 *	角色死亡
+	 *	@param1: 发起方id
+	 *	@param2: 死亡方id
+	 */
+	static TMulticastDelegate<void(int32, int32)> OnCharacterDeath;
 };
