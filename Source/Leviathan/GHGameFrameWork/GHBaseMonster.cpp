@@ -39,6 +39,8 @@ void AGHBaseMonster::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnDefaultController();
+
+	BornLocation = GetActorLocation();
 }
 
 // Called every frame

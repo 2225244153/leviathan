@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "BattleTargetComponent.generated.h"
 
+class AGHBaseMonster;
 class AGHBaseCharacter;
 
 /*
@@ -58,15 +59,33 @@ public:
 	void FinishAlert();
 	void UpdateAlert(float DeltaTime);
 	void SetAlertTarget(AGHBaseCharacter* alertTarget);
+	
+	/*
+	 *	检查返回距离
+	 */
+	void CheckBackDistance();
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
+	//寻找目标开关
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
 	bool bFindBattleTarget;
 	//警戒最大值，超过最大值则设置目标进入战斗状态
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
 	int32 MaxAlertValue = 100;
 	//警戒值每秒浮动速率
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleTarget")
-	float AlertFloatRatePerSecond = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	float AlertFloatRatePerSecond = 20.f;
+	//丢失目标范围，超过此范围丢失目标
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	float LoseTargetDistance = 1500.f;
+	//发现目标的角度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	float FindTargetAngle = 90.f;
+	//搜寻目标警戒最大范围
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	float FindTargetWarnMaxDistance = 1000.f;
+	//返回出生点距离，超过此距离直接丢失目标返回出生点
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	float BackDistance = 3000.f;
 	
 private:
 	UPROPERTY()
@@ -74,7 +93,7 @@ private:
 	UPROPERTY()
 	AGHBaseCharacter* AlertTarget;
 	UPROPERTY()
-	AGHBaseCharacter* Owner;
+	AGHBaseMonster* Owner;
 
 	//是否再警戒状态
 	bool bAlert;

@@ -20,6 +20,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GH|Utils")
 	static float CalcDistance(AActor* myself, AActor* target, bool dis2D = true);
+	UFUNCTION(BlueprintCallable, Category = "GH|Utils")
+	static float CalcDistance2(AActor* character, FVector& loc, bool dis2D = true);
+	UFUNCTION(BlueprintCallable, Category = "GH|Utils")
+	static float CalcDistance3(FVector& loc1, FVector& loc2, bool dis2D = true);
 	/*
 	 * 计算目标基于自身正前方的角度
 	 */

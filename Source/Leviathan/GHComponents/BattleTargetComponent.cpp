@@ -4,6 +4,7 @@
 #include "BattleTargetComponent.h"
 
 #include "Leviathan/GameDefine.h"
+#include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHGameFrameWork/GHBasePlayer.h"
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
 #include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
@@ -26,7 +27,7 @@ void UBattleTargetComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Owner = Cast<AGHBaseCharacter>(GetOwner());
+	Owner = Cast<AGHBaseMonster>(GetOwner());
 }
 
 
@@ -45,6 +46,7 @@ void UBattleTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 
 	UpdateAlert(DeltaTime);
+	CheckBackDistance();
 }
 
 AGHBaseCharacter* UBattleTargetComponent::GetBattleTarget()
@@ -94,13 +96,13 @@ void UBattleTargetComponent::FindBattleTarget()
 		}
 		
 		float dis = UGHCommonUtils::CalcDistance(Owner, player);
-		if (dis > AIFindTargetWarnMaxDistance)
+		if (dis > FindTargetWarnMaxDistance)
 		{
 			continue;
 		}
 
 		float angle = UGHCommonUtils::Calc2DAngleByForward(Owner, player);
-		if (angle > (AIFindTargetAngle / 2))
+		if (angle > (FindTargetAngle / 2))
 		{
 			if (tempalertTarget == nullptr)
 			{
@@ -143,7 +145,7 @@ bool UBattleTargetComponent::CheckTargetValid()
 	}
 
 	float dis = UGHCommonUtils::CalcDistance(Owner, BattleTarget);
-	return dis < AIPursueMaxDistance;
+	return dis < LoseTargetDistance;
 }
 
 void UBattleTargetComponent::StartAlert()
@@ -202,3 +204,12 @@ void UBattleTargetComponent::SetAlertTarget(AGHBaseCharacter* alertTarget)
 	AlertTarget = alertTarget;
 }
 
+void UBattleTargetComponent::CheckBackDistance()
+{
+	float distance = UGHCommonUtils::CalcDistance2(Owner, Owner->BornLocation);
+	if (distance > BackDistance)
+	{
+		//todo增加丢失枚举类型
+		ResetBattleTarget();
+	}
+}

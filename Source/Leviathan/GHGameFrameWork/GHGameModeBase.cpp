@@ -8,6 +8,7 @@
 #include "GHBasePlayerController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Leviathan/GameDefine.h"
+#include "Leviathan/GHComponents/BattleTargetComponent.h"
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
 
 AGHGameModeBase::AGHGameModeBase()
@@ -53,13 +54,16 @@ void AGHGameModeBase::TickTimer()
 
 			if (bDebugTargetRange)
 			{
-				float angleRadian = FMath::DegreesToRadians(AIFindTargetAngle / 2);
-				DrawDebugCone(monster->GetWorld(), monster->GetActorLocation(), monster->GetActorForwardVector(), AIFindTargetWarnMaxDistance, angleRadian, 0, 12, FColor::Red, false, 0.2);
-				DrawDebugCircle(GetWorld(), monster->GetActorLocation(), AIFindTargetWarnMaxDistance, 36, FColor::Green, false, 0.2, 0, 0, FVector(1, 0, 0), FVector(0, 1, 0), false);
+				float findTargetAngle = monster->TargetComponent->FindTargetAngle;
+				float findTargetWarnMaxDistance = monster->TargetComponent->FindTargetWarnMaxDistance;
+				float angleRadian = FMath::DegreesToRadians(findTargetAngle / 2);
+				DrawDebugCone(monster->GetWorld(), monster->GetActorLocation(), monster->GetActorForwardVector(), findTargetWarnMaxDistance, angleRadian, 0, 12, FColor::Red, false, 0.2);
+				DrawDebugCircle(GetWorld(), monster->GetActorLocation(), findTargetWarnMaxDistance, 36, FColor::Green, false, 0.2, 0, 0, FVector(1, 0, 0), FVector(0, 1, 0), false);
 			}
 			if (bDebugAIPurse)
 			{
-				DrawDebugCircle(GetWorld(), monster->GetActorLocation(), AIPursueMaxDistance, 36, FColor::Purple, false, 0.2, 0, 0, FVector(1, 0, 0), FVector(0, 1, 0), false);
+				float loseTargetDistance = monster->TargetComponent->LoseTargetDistance;
+				DrawDebugCircle(GetWorld(), monster->GetActorLocation(), loseTargetDistance, 36, FColor::Purple, false, 0.2, 0, 0, FVector(1, 0, 0), FVector(0, 1, 0), false);
 			}
 		}
 	}

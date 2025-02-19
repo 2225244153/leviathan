@@ -57,7 +57,11 @@ public:
 	FGameplayTag GetState();
 	UFUNCTION(BlueprintCallable)
 	void SetState(FGameplayTag state);
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=AIState)
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIStateParams")
 	FGameplayTag TagState;
+	//最大寻找时间，超过此寻找时间返回出生点
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIStateParams")
+	float MaxFindingTime = 10.f;
 };

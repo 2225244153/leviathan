@@ -35,9 +35,12 @@ public:
 
 	AGHBaseCharacter* GetBattleTarget();
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBattleTargetComponent* TargetComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAIStateComponent* StateComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FVector BornLocation;
 };
