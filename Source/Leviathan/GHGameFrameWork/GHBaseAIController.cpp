@@ -4,6 +4,7 @@
 #include "GHBaseAIController.h"
 
 #include "GHBaseMonster.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 AGHBaseAIController::AGHBaseAIController() : BaseMonster(nullptr)
@@ -23,6 +24,14 @@ void AGHBaseAIController::BeginPlay()
 void AGHBaseAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AGHBaseAIController::SetBornLocation(FVector& bornLocation)
+{
+	if (Blackboard != nullptr)
+	{
+		Blackboard->SetValueAsVector(TEXT("BornLocation"), bornLocation);
+	}
 }
 
 void AGHBaseAIController::OnPossess(APawn* InPawn)

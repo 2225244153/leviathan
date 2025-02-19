@@ -7,6 +7,8 @@
 #include "AIStateComponent.generated.h"
 
 class AGHBaseCharacter;
+class AGHBaseMonster;
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(AI_Monster_State_Init)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(AI_Monster_State_Alert)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(AI_Monster_State_Battle)
@@ -37,6 +39,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	// Called every frame
@@ -45,8 +48,8 @@ public:
 	/*
 	 * CoreDelegates begin
 	 */
-	void OnBattleFindTarget(AGHBaseCharacter* target);
-	void OnBattleLoseTarget();
+	void OnBattleSearchTarget(AGHBaseCharacter* target);
+	void OnBattleLoseTarget(uint8 loseType);
 	void OnStartAlert();
 	void OnFinishAlert();
 	/*
@@ -58,10 +61,32 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetState(FGameplayTag state);
 
+	/*
+	 *	寻找状态
+	 */
+	void StartFinding();
+	void FinishFinding();
+	void UpdateFindingTime(float DeltaTime);
+
+	//检测是否回到出生点
+	void CheckBackBornLocation(float DeltaTime);
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIStateParams")
 	FGameplayTag TagState;
 	//最大寻找时间，超过此寻找时间返回出生点
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIStateParams")
 	float MaxFindingTime = 10.f;
+
+private:
+	UPROPERTY()
+	AGHBaseMonster* Owner;
+	bool bFinding;
+	//当前寻找时间
+	float CurFindingTime;
+	float CurBackTime;
+
+	FDelegateHandle SearchTargetDelegateHandle;
+	FDelegateHandle LoseTargetDelegateHandle;
 };
+

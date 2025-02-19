@@ -41,6 +41,11 @@ void AGHBaseMonster::BeginPlay()
 	SpawnDefaultController();
 
 	BornLocation = GetActorLocation();
+	AGHBaseAIController* aiController = Cast<AGHBaseAIController>(GetController());
+	if (aiController != nullptr)
+	{
+		aiController->SetBornLocation(BornLocation);
+	}
 }
 
 // Called every frame
@@ -58,5 +63,10 @@ void AGHBaseMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 AGHBaseCharacter* AGHBaseMonster::GetBattleTarget()
 {
 	return TargetComponent->GetBattleTarget();
+}
+
+FGameplayTag AGHBaseMonster::GetState()
+{
+	return StateComponent->GetState();
 }
 

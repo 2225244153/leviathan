@@ -27,11 +27,12 @@ public:
 	void GHDebugPauseAI(int32 active);
 	/*
 	 *	debug怪物
-	 *	@param type 1-显示怪物警戒范围 2-显示怪物跟随范围
+	 *	@param type 1-显示怪物警戒范围 2-显示怪物跟随范围 3-显示怪物出生点范围
 	 */
 	UFUNCTION(BlueprintCallable, Exec)
 	void GHDebugAIMonster(int32 type, int32 active);
 
 	bool bDebugTargetRange;//怪物警戒范围
 	bool bDebugAIPurse;//怪物跟随范围
+	bool bDebugBornRange;//怪物出生点范围，超过此返回back
 };

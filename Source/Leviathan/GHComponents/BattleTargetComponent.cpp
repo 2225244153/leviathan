@@ -3,6 +3,7 @@
 
 #include "BattleTargetComponent.h"
 
+#include "AIStateComponent.h"
 #include "Leviathan/GameDefine.h"
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHGameFrameWork/GHBasePlayer.h"
@@ -12,7 +13,7 @@
 
 
 // Sets default values for this component's properties
-UBattleTargetComponent::UBattleTargetComponent() : bFindBattleTarget(true), BattleTarget(nullptr), AlertTarget(nullptr), CurAlertValue(0)
+UBattleTargetComponent::UBattleTargetComponent() : bSearchBattleTarget(true), BattleTarget(nullptr), AlertTarget(nullptr), CurAlertValue(0)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -28,6 +29,15 @@ void UBattleTargetComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Owner = Cast<AGHBaseMonster>(GetOwner());
+
+	AIStateChangedDelegateHandle = UGHCoreDelegatesMgr::OnAIStateChanged.AddUObject(this, &UBattleTargetComponent::OnAIStateChanged);
+}
+
+void UBattleTargetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UGHCoreDelegatesMgr::OnAIStateChanged.Remove(AIStateChangedDelegateHandle);
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 
@@ -36,17 +46,39 @@ void UBattleTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (bFindBattleTarget)
+	if (bSearchBattleTarget)
 	{
-		FindBattleTarget();
+		SearchBattleTarget();
 	}
 	else
 	{
-		ResetBattleTarget();
+		LoseBattleTarget(ELoseTargetType::E_LoseTargetType_Normal);
 	}
 
 	UpdateAlert(DeltaTime);
 	CheckBackDistance();
+}
+
+void UBattleTargetComponent::OnAIStateChanged(FGameplayTag& oldTag, FGameplayTag& newTag)
+{
+	if (newTag == AI_Monster_State_Death)
+	{
+		bSearchBattleTarget = false;
+		bSearchAlertTarget = false;
+		return;
+	}
+	//back状态不搜寻目标
+	if (newTag == AI_Monster_State_Back)
+	{
+		bSearchBattleTarget = false;
+	}
+	else if (oldTag == AI_Monster_State_Back)
+	{
+		bSearchBattleTarget = true;
+	}
+	
+	//Find状态搜寻目标不需要警戒范围触发
+	bSearchAlertTarget = !(newTag == AI_Monster_State_Find);
 }
 
 AGHBaseCharacter* UBattleTargetComponent::GetBattleTarget()
@@ -62,10 +94,10 @@ void UBattleTargetComponent::SetBattleTarget(AGHBaseCharacter* target)
 		return;
 	}
 	BattleTarget = target;
-	UGHCoreDelegatesMgr::OnBattleFindTarget.Broadcast(BattleTarget);
+	UGHCoreDelegatesMgr::OnBattleSearchTarget.Broadcast(BattleTarget);
 }
 
-void UBattleTargetComponent::ResetBattleTarget()
+void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)
 {
 	if (BattleTarget == nullptr)
 	{
@@ -73,10 +105,10 @@ void UBattleTargetComponent::ResetBattleTarget()
 	}
 	
 	BattleTarget = nullptr;
-	UGHCoreDelegatesMgr::OnBattleLoseTarget.Broadcast();
+	UGHCoreDelegatesMgr::OnBattleLoseTarget.Broadcast(loseType);
 }
 
-void UBattleTargetComponent::FindBattleTarget()
+void UBattleTargetComponent::SearchBattleTarget()
 {
 	//目标不合法才需要重新查找目标，demo暂不支持切换目标的逻辑
 	if (CheckTargetValid())
@@ -87,7 +119,7 @@ void UBattleTargetComponent::FindBattleTarget()
 	TArray<AGHBasePlayer*> allPlayers;
 	UGHCharacterMgr::Get()->GetAllPlayers(allPlayers);
 	AGHBasePlayer* tempTarget = nullptr;
-	AGHBasePlayer* tempalertTarget = nullptr;
+	AGHBasePlayer* tempAlertTarget = nullptr;
 	for (auto& player : allPlayers)
 	{
 		if (!player->IsValidLowLevelFast())
@@ -96,32 +128,32 @@ void UBattleTargetComponent::FindBattleTarget()
 		}
 		
 		float dis = UGHCommonUtils::CalcDistance(Owner, player);
-		if (dis > FindTargetWarnMaxDistance)
+		if (dis > SearchTargetWarnMaxDistance)
 		{
 			continue;
 		}
 
 		float angle = UGHCommonUtils::Calc2DAngleByForward(Owner, player);
-		if (angle > (FindTargetAngle / 2))
+		if (angle > (SearchTargetAngle / 2))
 		{
-			if (tempalertTarget == nullptr)
+			if (bSearchAlertTarget && tempAlertTarget == nullptr)
 			{
-				tempalertTarget = player;
+				tempAlertTarget = player;
 			}
 			continue;
 		}
 		//todo 选到目标就直接退出，暂不考虑择优选择
 		tempTarget = player;
-		tempalertTarget = nullptr;//选到目标清空警戒目标
+		tempAlertTarget = nullptr;//选到目标清空警戒目标
 		break;
 	}
 
 	//只要找到警戒目标就开始警戒，若找到目标则会停止警戒
-	if (AlertTarget == nullptr && tempalertTarget != nullptr)
+	if (AlertTarget == nullptr && tempAlertTarget != nullptr)
 	{
-		SetAlertTarget(tempalertTarget);
+		SetAlertTarget(tempAlertTarget);
 	}
-	else if (AlertTarget != nullptr && tempalertTarget == nullptr)
+	else if (AlertTarget != nullptr && tempAlertTarget == nullptr)
 	{
 		SetAlertTarget(nullptr);
 	}
@@ -133,7 +165,7 @@ void UBattleTargetComponent::FindBattleTarget()
 	}
 	else if (BattleTarget != nullptr && tempTarget == nullptr)
 	{
-		ResetBattleTarget();
+		LoseBattleTarget(ELoseTargetType::E_LoseTargetType_Normal);
 	}
 }
 
@@ -209,7 +241,6 @@ void UBattleTargetComponent::CheckBackDistance()
 	float distance = UGHCommonUtils::CalcDistance2(Owner, Owner->BornLocation);
 	if (distance > BackDistance)
 	{
-		//todo增加丢失枚举类型
-		ResetBattleTarget();
+		LoseBattleTarget(ELoseTargetType::E_LoseTargetType_Back);
 	}
 }

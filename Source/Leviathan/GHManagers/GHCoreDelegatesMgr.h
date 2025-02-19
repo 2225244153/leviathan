@@ -15,11 +15,11 @@ public:
 	/*
 	 *	BattleTargetComponent发现目标广播
 	 */
-	static TMulticastDelegate<void(AGHBaseCharacter*)> OnBattleFindTarget;
+	static TMulticastDelegate<void(AGHBaseCharacter*)> OnBattleSearchTarget;
 	/*
 	 *  BattleTargetComponent丢失目标广播
 	 */
-	static TMulticastDelegate<void()> OnBattleLoseTarget;
+	static TMulticastDelegate<void(uint8)> OnBattleLoseTarget;
 	/*
 	 *	BattleTargetComponent进入警戒状态
 	 */
@@ -28,4 +28,9 @@ public:
 	 *  BattleTargetComponent离开警戒状态(警戒状态发现目标不会调用)
 	 */
 	static TDelegate<void()> OnFinishAlert;
+
+	/*
+	 *	AIStateComponent状态发生改变
+	 */
+	static TMulticastDelegate<void(FGameplayTag&, FGameplayTag&)> OnAIStateChanged;
 };

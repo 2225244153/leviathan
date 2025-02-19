@@ -33,8 +33,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
 
+	UFUNCTION(BlueprintCallable)
 	AGHBaseCharacter* GetBattleTarget();
-
+	UFUNCTION(BlueprintCallable)
+	FGameplayTag GetState();
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBattleTargetComponent* TargetComponent;

@@ -3,11 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "BattleTargetComponent.generated.h"
 
+struct FGameplayTag;
 class AGHBaseMonster;
 class AGHBaseCharacter;
+
+enum ELoseTargetType : uint8
+{
+	E_LoseTargetType_Normal = 0,	//正常超过追击范围丢失目标
+	E_LoseTargetType_Back = 1,		//超过出生点范围，返回出生点丢失目标
+};
 
 /*
  * 查找战斗目标组件，默认该组件只绑定BaseMonster，只会查找BasePlayer为目标
@@ -29,10 +37,19 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	/*
+	 * CoreDelegates begin
+	 */
+	void OnAIStateChanged(FGameplayTag& oldTag, FGameplayTag& newTag);
+	/*
+	 * CoreDelegates end
+	 */
 
 	UFUNCTION(BlueprintCallable)
 	AGHBaseCharacter* GetBattleTarget();
@@ -40,13 +57,12 @@ public:
 	void SetBattleTarget(AGHBaseCharacter* target);
 	//todo监听受击直接设置攻击者为目标
 	
-	UFUNCTION(BlueprintCallable)
-	void ResetBattleTarget();
+	void LoseBattleTarget(ELoseTargetType loseType);
 
 	/*
 	 *	寻找目标
 	 */
-	void FindBattleTarget();
+	void SearchBattleTarget();
 	/*
 	 * 判断目标是否合法 目标为空或者超过范围则为不合法
 	 */
@@ -64,27 +80,25 @@ public:
 	 *	检查返回距离
 	 */
 	void CheckBackDistance();
+	
 public:
-	//寻找目标开关
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
-	bool bFindBattleTarget;
 	//警戒最大值，超过最大值则设置目标进入战斗状态
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
 	int32 MaxAlertValue = 100;
 	//警戒值每秒浮动速率
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
 	float AlertFloatRatePerSecond = 20.f;
 	//丢失目标范围，超过此范围丢失目标
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
 	float LoseTargetDistance = 1500.f;
 	//发现目标的角度
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
-	float FindTargetAngle = 90.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
+	float SearchTargetAngle = 90.f;
 	//搜寻目标警戒最大范围
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
-	float FindTargetWarnMaxDistance = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
+	float SearchTargetWarnMaxDistance = 1000.f;
 	//返回出生点距离，超过此距离直接丢失目标返回出生点
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FindTargetParams")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
 	float BackDistance = 3000.f;
 	
 private:
@@ -94,9 +108,14 @@ private:
 	AGHBaseCharacter* AlertTarget;
 	UPROPERTY()
 	AGHBaseMonster* Owner;
-
-	//是否再警戒状态
+	//寻找目标开关
+	bool bSearchBattleTarget;
+	//警戒状态开关
+	bool bSearchAlertTarget;
+	//是否在警戒状态
 	bool bAlert;
 	//当前警戒值
 	float CurAlertValue;
+
+	FDelegateHandle AIStateChangedDelegateHandle;
 };

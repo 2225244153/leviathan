@@ -1,7 +1,10 @@
 
 #include "AIStateComponent.h"
 
+#include "BattleTargetComponent.h"
+#include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
+#include "Leviathan/GHUtils/GHCommonUtils.h"
 
 UE_DEFINE_GAMEPLAY_TAG(AI_Monster_State_Init, "AI.State.Init");
 UE_DEFINE_GAMEPLAY_TAG(AI_Monster_State_Alert, "AI.State.Alert");
@@ -31,12 +34,24 @@ void UAIStateComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Owner = Cast<AGHBaseMonster>(GetOwner());
+
 	SetState(AI_Monster_State_Init);
 
-	UGHCoreDelegatesMgr::OnBattleFindTarget.AddUObject(this, &UAIStateComponent::OnBattleFindTarget);
-	UGHCoreDelegatesMgr::OnBattleLoseTarget.AddUObject(this, &UAIStateComponent::OnBattleLoseTarget);
+	SearchTargetDelegateHandle = UGHCoreDelegatesMgr::OnBattleSearchTarget.AddUObject(this, &UAIStateComponent::OnBattleSearchTarget);
+	LoseTargetDelegateHandle = UGHCoreDelegatesMgr::OnBattleLoseTarget.AddUObject(this, &UAIStateComponent::OnBattleLoseTarget);
 	UGHCoreDelegatesMgr::OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
 	UGHCoreDelegatesMgr::OnFinishAlert.BindUObject(this, &UAIStateComponent::OnFinishAlert);
+}
+
+void UAIStateComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UGHCoreDelegatesMgr::OnBattleSearchTarget.Remove(SearchTargetDelegateHandle);
+	UGHCoreDelegatesMgr::OnBattleLoseTarget.Remove(LoseTargetDelegateHandle);
+	UGHCoreDelegatesMgr::OnStartAlert.Unbind();
+	UGHCoreDelegatesMgr::OnFinishAlert.Unbind();
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -44,17 +59,37 @@ void UAIStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (bFinding)
+	{
+		UpdateFindingTime(DeltaTime);
+	}
+	if (TagState == AI_Monster_State_Back)
+	{
+		CheckBackBornLocation(DeltaTime);
+	}
 }
 
-void UAIStateComponent::OnBattleFindTarget(AGHBaseCharacter* target)
+void UAIStateComponent::OnBattleSearchTarget(AGHBaseCharacter* target)
 {
+	//AI_Monster_State_Find状态重新找到目标直接结束Finding
+	FinishFinding();
+	
 	SetState(AI_Monster_State_Battle);
 }
 
-void UAIStateComponent::OnBattleLoseTarget()
+void UAIStateComponent::OnBattleLoseTarget(uint8 loseType)
 {
-	SetState(AI_Monster_State_Find);
+	switch (loseType)
+	{
+	case E_LoseTargetType_Normal:
+		SetState(AI_Monster_State_Find);
+		break;
+	case E_LoseTargetType_Back:
+		SetState(AI_Monster_State_Back);
+		break;
+	default:
+		break;
+	}
 }
 
 void UAIStateComponent::OnStartAlert()
@@ -76,5 +111,58 @@ void UAIStateComponent::SetState(FGameplayTag state)
 {
 	UE_LOG(LogTemp, Warning, TEXT("GH------UAIStateComponent::SetState: %s"), *state.ToString());
 	TagState = state;
+
+	if (state == AI_Monster_State_Find)
+	{
+		StartFinding();
+	}
+	else if (state == AI_Monster_State_Back)
+	{
+		CurBackTime = 0;
+	}
 }
 
+void UAIStateComponent::StartFinding()
+{
+	CurFindingTime = 0;
+	bFinding = true;
+}
+
+void UAIStateComponent::FinishFinding()
+{
+	CurFindingTime = 0;
+	bFinding = false;
+}
+
+void UAIStateComponent::UpdateFindingTime(float DeltaTime)
+{
+	if (CurFindingTime > MaxFindingTime)
+	{
+		FinishFinding();
+		SetState(AI_Monster_State_Back);
+		return;
+	}
+	
+	CurFindingTime += DeltaTime;
+}
+
+void UAIStateComponent::CheckBackBornLocation(float DeltaTime)
+{
+	//超过20s直接传送回出生点
+	if (CurBackTime > 20.f)
+	{
+		CurBackTime = 0;
+		Owner->SetActorLocation(Owner->BornLocation);
+		SetState(AI_Monster_State_Init);
+		return;
+	}
+	float distance = UGHCommonUtils::CalcDistance2(Owner, Owner->BornLocation);
+	if (distance < 100.f)
+	{
+		CurBackTime = 0;
+		SetState(AI_Monster_State_Init);
+		return;
+	}
+
+	CurBackTime += DeltaTime;
+}
