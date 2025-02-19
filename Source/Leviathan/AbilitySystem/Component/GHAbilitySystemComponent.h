@@ -16,6 +16,17 @@ struct FInputActionAbilityMap
 	TMap<FGameplayTag, TSubclassOf<UGHGameplayAbility>> InputActionMap;
 };
 
+USTRUCT(BlueprintType)
+struct FGHAbilityDesc
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AbilityDesc")
+	int32 SkillID;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AbilityDesc")
+	FGameplayAbilitySpecHandle AbilitySpecHandle;
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(LogGHAbilitySystemComponent, Log, All)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -24,15 +35,10 @@ class LEVIATHAN_API UGHAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Sets default values for this component's properties
 	UGHAbilitySystemComponent();
-
-	UFUNCTION(BlueprintCallable, meta=(DisplayName = "CancelAbilityHandle"))
-	void K2_CancelAbilityHandle(const FGameplayAbilitySpecHandle AbilitySpecHandle);
-
-	UFUNCTION(BlueprintCallable, meta=(DisplayName = "CancelAbilies"))
-	void K2_CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithOutTags,
-	                        UGameplayAbility* Ignore = nullptr);
 
 	virtual void InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor);
 
@@ -49,13 +55,10 @@ public:
 
 	/**
 	 * @brief 
-	 * @param GameplayCueTag 
-	 * @param GameplayCueParameters 
+	 * @return 返回"可用的”SkillID列表
 	 */
-	UFUNCTION(BlueprintCallable, Category = "GameplayCue",
-		Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
-	void ExecuteGameplayCueLocal(const FGameplayTag GameplayCueTag,
-	                             const FGameplayCueParameters& GameplayCueParameters);
+	UFUNCTION(BlueprintPure)
+	TArray<int32> GetUsableAbilities();
 
 	UFUNCTION(BlueprintCallable, Category = "GameplayCue", DisplayName = "ExecuteGameplayCue",
 		Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
@@ -74,14 +77,8 @@ public:
 		Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
 	void K2_RemoveGameplayCue(const FGameplayTag GameplayCueTag);
 
-	UFUNCTION(BlueprintCallable, Category = "Tag")
-	void AddLooseTag(const FGameplayTag& tag);
-
-	UFUNCTION(BlueprintCallable, Category = "Tag")
-	void RemoveLooseTag(const FGameplayTag& tag);
-
 	UFUNCTION(BlueprintCallable)
-	UGameplayAbility* FindGameplayAbilityByHandle(const FGameplayAbilitySpecHandle& handle);
+	bool TryActivateSkill(int32 SkillID);
 
 	UFUNCTION(BlueprintCallable)
 	bool InitAttributeSet();
@@ -95,25 +92,32 @@ public:
 	TSubclassOf<UGHGameplayAbility> GetAbilityByInputTag(FGameplayTag InputTag);
 
 private:
-	bool Give(TSubclassOf<UGHGameplayAbility> AbilityClass, int32 SkillLevel, int32 InputID);
+	bool Give(int32 SkillID, int32 SkillLevel, int32 InputID);
 
 	//某些逻辑需要延迟到AbilitySystemComponent初始化好以后，这里提供时机
 	void OnAbilitySystemComponentReady();
+
+	int32 FindSkillIDByAbilityHandle(const FGameplayAbilitySpecHandle& AbilitySpecHandle);
+
+	FSkillField* GetSkillFieldBySkillID(int32 SkillID);
 
 public:
 	/*
 	 * 默认技能
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGHAbilityInfoList> AbilityInfoListAsset;
-
+	TArray<TObjectPtr<UGHAbilityInfoList>> AbilityInfoListAssets;
+	
 	/**
 	 * @brief 属性集合描述
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Attribute")
 	TObjectPtr<UGHAttributeSetDesc> AttributeSetDefault;
 
-	// 表征技能系统
+	//输入与技能对应的部分
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="")
 	FInputActionAbilityMap AbilityMap;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	TArray<FGHAbilityDesc> AbilityDescs;
 };

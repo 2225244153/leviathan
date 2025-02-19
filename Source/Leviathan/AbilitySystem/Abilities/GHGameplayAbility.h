@@ -53,6 +53,10 @@ public:
 	                        const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility,
 	                        bool bWasCancelled) override;
 
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+
+	
+
 protected:
 	/**
 	 * @brief BP 激活失败时通知
@@ -87,12 +91,6 @@ struct LEVIATHAN_API FGHAbilitySpec
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ability")
 	int Level = 1;
-
-	/**
-	 * @brief 
-	 */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ability")
-	int InputID = 0;
 };
 
 

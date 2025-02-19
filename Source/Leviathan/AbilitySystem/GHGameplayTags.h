@@ -21,6 +21,7 @@ struct LEVIATHAN_API FGHGameplayTags
 	FGameplayTag Effect;
 	FGameplayTag Character;
 	FGameplayTag CoolDown;
+	FGameplayTag Input;
 
 	void InitNativeTags();
 

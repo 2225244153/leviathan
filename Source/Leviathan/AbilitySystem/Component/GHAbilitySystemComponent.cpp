@@ -6,25 +6,23 @@
 #include "GameplayCueManager.h"
 #include "Leviathan/AbilitySystem/Abilities/GHGameplayAbility.h"
 #include "Leviathan/AbilitySystem/Attribute/GHAttributeSetBase.h"
+#include "Leviathan/Log/GHLog.h"
+#include "Net/UnrealNetwork.h"
 
 #define LOCTEXT_NAMESPACE "GHAbilitySystemComponent"
 DEFINE_LOG_CATEGORY(LogGHAbilitySystemComponent)
+
+void UGHAbilitySystemComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UGHAbilitySystemComponent, AbilityDescs);
+}
 
 // Sets default values for this component's properties
 UGHAbilitySystemComponent::UGHAbilitySystemComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-}
-
-void UGHAbilitySystemComponent::K2_CancelAbilityHandle(const FGameplayAbilitySpecHandle AbilitySpecHandle)
-{
-	CancelAbilityHandle(AbilitySpecHandle);
-}
-
-void UGHAbilitySystemComponent::K2_CancelAbilities(const FGameplayTagContainer& WithTags,
-                                                   const FGameplayTagContainer& WithOutTags, UGameplayAbility* Ignore)
-{
-	CancelAbilities(&WithTags, &WithOutTags, Ignore);
 }
 
 void UGHAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)
@@ -96,6 +94,7 @@ void UGHAbilitySystemComponent::InitAttributeSetDefaultValue(UGHAttributeSetDesc
 			DefaultAttModifierInfo.Attribute = pair.Key;
 			DefaultAttModifierInfo.ModifierOp = EGameplayModOp::Override;
 
+
 			FScalableFloat GEFloatScalar = pair.Value;
 			DefaultAttModifierInfo.ModifierMagnitude = GEFloatScalar;
 			GE->Modifiers.Add(DefaultAttModifierInfo);
@@ -105,11 +104,26 @@ void UGHAbilitySystemComponent::InitAttributeSetDefaultValue(UGHAttributeSetDesc
 	ApplyGameplayEffectToSelf(GE, 1.f, MakeEffectContext());
 }
 
-void UGHAbilitySystemComponent::ExecuteGameplayCueLocal(const FGameplayTag GameplayCueTag,
-                                                        const FGameplayCueParameters& GameplayCueParameters)
+TArray<int32> UGHAbilitySystemComponent::GetUsableAbilities()
 {
-	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(
-		GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Executed, GameplayCueParameters);
+	TArray<FGameplayAbilitySpec> InActivatableAbilities = GetActivatableAbilities();
+
+	TArray<int32> SkillIDs;
+	for (const FGameplayAbilitySpec& Spec : InActivatableAbilities)
+	{
+		UGameplayAbility* AbilityInstance = Spec.GetPrimaryInstance();
+		if (AbilityInstance && AbilityInstance->CanActivateAbility(Spec.Handle, AbilityActorInfo.Get(), nullptr,
+		                                                           nullptr, nullptr))
+		{
+			int32 SkillID = FindSkillIDByAbilityHandle(Spec.Handle);
+			if (SkillID != -1)
+			{
+				SkillIDs.Add(SkillID);
+			}
+		}
+	}
+
+	return SkillIDs;
 }
 
 void UGHAbilitySystemComponent::K2_ExecuteGameplayCue(const FGameplayTag GameplayCueTag,
@@ -129,17 +143,15 @@ void UGHAbilitySystemComponent::K2_RemoveGameplayCue(const FGameplayTag Gameplay
 	RemoveGameplayCue(GameplayCueTag);
 }
 
-UGameplayAbility* UGHAbilitySystemComponent::FindGameplayAbilityByHandle(const FGameplayAbilitySpecHandle& handle)
+bool UGHAbilitySystemComponent::TryActivateSkill(int32 SkillID)
 {
-	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	FSkillField* SkillField = GetSkillFieldBySkillID(SkillID);
+	if (!SkillField)
 	{
-		if (Spec.Handle == handle)
-		{
-			UGameplayAbility* GameplayAbility = Spec.GetPrimaryInstance();
-			return GameplayAbility ? GameplayAbility : Spec.Ability.Get();
-		}
+		return false;
 	}
-	return nullptr;
+
+	return TryActivateAbilityByClass(SkillField->Ability);
 }
 
 bool UGHAbilitySystemComponent::InitAttributeSet()
@@ -155,24 +167,22 @@ bool UGHAbilitySystemComponent::InitAttributeSet()
 
 bool UGHAbilitySystemComponent::InitAbility()
 {
-	if (AbilityInfoListAsset == nullptr)
+	if (AbilityInfoListAssets.Num() == 0)
 	{
 		return false;
 	}
 
 	if (GetOwnerRole() == ROLE_Authority)
 	{
-		// 权威端会give所有默认技能类
-		for (auto& AbilityInfo : AbilityInfoListAsset->AbilityInfoList)
+		for (const auto& AbilityInfoListAsset : AbilityInfoListAssets)
 		{
-			if (AbilityInfo.AbilityClass == nullptr)
+			// 权威端会give所有默认技能类
+			for (auto& AbilityInfo : AbilityInfoListAsset->AbilityInfoList)
 			{
-				continue;
-			}
-
-			if (!Give(AbilityInfo.AbilityClass, AbilityInfo.Level, 1))
-			{
-				continue;
+				if (!Give(AbilityInfo.SkillID, AbilityInfo.Level, 1))
+				{
+					LOG_ERROR("技能赋予失败 SkillID:%d", AbilityInfo.SkillID);
+				}
 			}
 		}
 	}
@@ -185,21 +195,28 @@ TSubclassOf<UGHGameplayAbility> UGHAbilitySystemComponent::GetAbilityByInputTag(
 	TSubclassOf<UGHGameplayAbility>* GameplayAbilityClass = AbilityMap.InputActionMap.Find(InputTag);
 	if (!GameplayAbilityClass)
 	{
-		ensureMsgf(false,TEXT("No Ability Class Exist"));
 		return nullptr;
 	}
 
 	return *GameplayAbilityClass;
 }
 
-bool UGHAbilitySystemComponent::Give(TSubclassOf<UGHGameplayAbility> AbilityClass, int32 SkillLevel, int32 InputID)
-{
-	check(AbilityClass);
-	FGameplayAbilitySpec AbilitySpec = BuildAbilitySpecFromClass(
-		AbilityClass, SkillLevel, InputID);
-	FGameplayAbilitySpecHandle SpecHandle = GiveAbility(AbilitySpec);
 
-	if (!SpecHandle.IsValid())
+bool UGHAbilitySystemComponent::Give(int32 SkillID, int32 SkillLevel, int32 InputID)
+{
+	FSkillField* SkillField = GetSkillFieldBySkillID(SkillID);
+	if (!SkillField)
+	{
+		return false;
+	}
+
+	FGHAbilityDesc AbilityDesc;
+	FGameplayAbilitySpec AbilitySpec = BuildAbilitySpecFromClass(
+		SkillField->Ability, SkillLevel, InputID);
+	AbilityDesc.AbilitySpecHandle = GiveAbility(AbilitySpec);
+	AbilityDesc.SkillID = SkillID;
+	AbilityDescs.Emplace(AbilityDesc);
+	if (!AbilityDesc.AbilitySpecHandle.IsValid())
 	{
 		return false;
 	}
@@ -211,14 +228,39 @@ void UGHAbilitySystemComponent::OnAbilitySystemComponentReady()
 {
 }
 
-void UGHAbilitySystemComponent::AddLooseTag(const FGameplayTag& tag)
+int32 UGHAbilitySystemComponent::FindSkillIDByAbilityHandle(const FGameplayAbilitySpecHandle& AbilitySpecHandle)
 {
-	AddLooseGameplayTag(tag);
+	FGHAbilityDesc* AbilityDesc = AbilityDescs.FindByPredicate([AbilitySpecHandle](const FGHAbilityDesc& AbilityDesc)
+	{
+		return AbilityDesc.AbilitySpecHandle == AbilitySpecHandle;
+	});
+
+	if (AbilityDesc)
+	{
+		return AbilityDesc->SkillID;
+	}
+
+	return -1;
 }
 
-void UGHAbilitySystemComponent::RemoveLooseTag(const FGameplayTag& tag)
+FSkillField* UGHAbilitySystemComponent::GetSkillFieldBySkillID(int32 SkillID)
 {
-	RemoveLooseGameplayTag(tag);
+	//TODO:暂时HardCode 晚点再去处理这种表格
+	UDataTable* SkillDataTable = LoadObject<UDataTable>(
+		nullptr, TEXT("/Script/Engine.DataTable'/Game/GH_Work/Data/Skill/DT_Skill.DT_Skill'"));
+
+	if (!SkillDataTable)
+	{
+		return nullptr;
+	}
+
+	FSkillField* SkillField = SkillDataTable->FindRow<FSkillField>(FName(*FString::FromInt(SkillID)), "");
+	if (!SkillField)
+	{
+		return nullptr;
+	}
+
+	return SkillField;
 }
 
 #undef LOCTEXT_NAMESPACE

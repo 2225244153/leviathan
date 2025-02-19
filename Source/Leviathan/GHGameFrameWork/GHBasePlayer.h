@@ -10,7 +10,9 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UInputActionManageComponent;
 struct FInputActionValue;
+
 
 UCLASS()
 class LEVIATHAN_API AGHBasePlayer : public AGHBaseCharacter
@@ -30,7 +32,7 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-	
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -50,7 +52,7 @@ public:
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-	
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -62,4 +64,8 @@ public:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UInputActionManageComponent* InputActionManageComponent;
 };
