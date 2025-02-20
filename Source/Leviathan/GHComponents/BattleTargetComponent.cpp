@@ -4,7 +4,6 @@
 #include "BattleTargetComponent.h"
 
 #include "AIStateComponent.h"
-#include "Leviathan/GameDefine.h"
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHGameFrameWork/GHBasePlayer.h"
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
@@ -13,7 +12,7 @@
 
 
 // Sets default values for this component's properties
-UBattleTargetComponent::UBattleTargetComponent() : bSearchBattleTarget(true), BattleTarget(nullptr), AlertTarget(nullptr), CurAlertValue(0)
+UBattleTargetComponent::UBattleTargetComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.

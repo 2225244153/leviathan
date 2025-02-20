@@ -99,8 +99,6 @@ private:
 
 	int32 FindSkillIDByAbilityHandle(const FGameplayAbilitySpecHandle& AbilitySpecHandle);
 
-	FSkillField* GetSkillFieldBySkillID(int32 SkillID);
-
 public:
 	/*
 	 * 默认技能

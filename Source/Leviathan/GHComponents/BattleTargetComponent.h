@@ -110,13 +110,13 @@ private:
 	UPROPERTY()
 	AGHBaseMonster* Owner;
 	//寻找目标开关
-	bool bSearchBattleTarget;
+	bool bSearchBattleTarget = true;
 	//警戒状态开关
-	bool bSearchAlertTarget;
+	bool bSearchAlertTarget = true;
 	//是否在警戒状态
-	bool bAlert;
+	bool bAlert = false;
 	//当前警戒值
-	float CurAlertValue;
+	float CurAlertValue = 0.f;
 
 	FDelegateHandle AIStateChangedDelegateHandle;
 	FDelegateHandle HurtDelegateHandle;

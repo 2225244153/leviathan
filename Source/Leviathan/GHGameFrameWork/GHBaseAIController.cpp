@@ -4,6 +4,7 @@
 #include "GHBaseAIController.h"
 
 #include "GHBaseMonster.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
@@ -18,6 +19,11 @@ void AGHBaseAIController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AGHBaseAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -52,6 +58,11 @@ void AGHBaseAIController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
+	UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if (BTComp != nullptr)
+	{
+		BTComp->StopTree();
+	}
 	BaseMonster = nullptr;
 }
 
