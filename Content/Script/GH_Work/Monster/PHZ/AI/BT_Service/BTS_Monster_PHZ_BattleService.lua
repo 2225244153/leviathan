@@ -50,6 +50,7 @@ function BTS_Monster_PHZ_BattleService:GetUsableSkillID()
         local index = UE4.UGHCommonUtils.RandomIntegerByWeight(skillsWeight)
         self.SkillID = usableSkillIDs:Get(index + 1)
     end
+    UE4.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, self.SkillID)
 end
 
 function BTS_Monster_PHZ_BattleService:CheckBattleState()
