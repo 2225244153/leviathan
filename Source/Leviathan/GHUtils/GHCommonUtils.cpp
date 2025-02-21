@@ -59,3 +59,43 @@ float UGHCommonUtils::Calc2DAngleByForward(AActor* myself, AActor* target)
 	float angle = 180.f / PI * FMath::Acos(FVector::DotProduct(selfForwardVec, targetVec));
 	return angle;
 }
+
+int32 UGHCommonUtils::RandomIntegerByWeight(TArray<int32>& weight)
+{
+	int32 num = weight.Num();
+	if (num == 0)
+	{
+		return -1;
+	}
+	if (num == 1)
+	{
+		return 0;
+	}
+	int32 randIndex = 0;
+	int32 weightValue = 0;
+	int32 sum = 0;
+	for (int32 i = 0; i < num; i++)
+	{
+		weightValue = weight[i];
+		sum += weightValue;
+	}
+
+	// FMath::Rand() : between 0 and RAND_MAX  #define RAND_MAX 0x7fff
+	int32 randValue = FMath::Rand() % sum;
+	for (int32 i = 0; i < num; i++)
+	{
+		weightValue = weight[i];
+		if (weightValue == 0)
+		{
+			continue;
+		}
+		if (randValue < weightValue)
+		{
+			randIndex = i;
+			break;
+		}
+		randValue -= weightValue;
+	}
+
+	return randIndex;
+}

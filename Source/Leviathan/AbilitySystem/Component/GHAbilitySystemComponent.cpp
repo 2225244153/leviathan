@@ -6,6 +6,7 @@
 #include "GameplayCueManager.h"
 #include "Leviathan/AbilitySystem/Abilities/GHGameplayAbility.h"
 #include "Leviathan/AbilitySystem/Attribute/GHAttributeSetBase.h"
+#include "Leviathan/GHUtils/SkillUtils.h"
 #include "Leviathan/Log/GHLog.h"
 #include "Net/UnrealNetwork.h"
 
@@ -145,13 +146,13 @@ void UGHAbilitySystemComponent::K2_RemoveGameplayCue(const FGameplayTag Gameplay
 
 bool UGHAbilitySystemComponent::TryActivateSkill(int32 SkillID)
 {
-	FSkillField* SkillField = GetSkillFieldBySkillID(SkillID);
-	if (!SkillField)
+	FSkillData SkillData = USkillUtils::GetSkillDataBySkillID(SkillID);
+	if (!SkillData.IsValid())
 	{
 		return false;
 	}
 
-	return TryActivateAbilityByClass(SkillField->Ability);
+	return TryActivateAbilityByClass(SkillData.Ability);
 }
 
 bool UGHAbilitySystemComponent::InitAttributeSet()
@@ -204,15 +205,15 @@ TSubclassOf<UGHGameplayAbility> UGHAbilitySystemComponent::GetAbilityByInputTag(
 
 bool UGHAbilitySystemComponent::Give(int32 SkillID, int32 SkillLevel, int32 InputID)
 {
-	FSkillField* SkillField = GetSkillFieldBySkillID(SkillID);
-	if (!SkillField)
+	FSkillData SkillData = USkillUtils::GetSkillDataBySkillID(SkillID);
+	if (!SkillData.IsValid())
 	{
 		return false;
 	}
 
 	FGHAbilityDesc AbilityDesc;
 	FGameplayAbilitySpec AbilitySpec = BuildAbilitySpecFromClass(
-		SkillField->Ability, SkillLevel, InputID);
+		SkillData.Ability, SkillLevel, InputID);
 	AbilityDesc.AbilitySpecHandle = GiveAbility(AbilitySpec);
 	AbilityDesc.SkillID = SkillID;
 	AbilityDescs.Emplace(AbilityDesc);
@@ -241,26 +242,6 @@ int32 UGHAbilitySystemComponent::FindSkillIDByAbilityHandle(const FGameplayAbili
 	}
 
 	return -1;
-}
-
-FSkillField* UGHAbilitySystemComponent::GetSkillFieldBySkillID(int32 SkillID)
-{
-	//TODO:暂时HardCode 晚点再去处理这种表格
-	UDataTable* SkillDataTable = LoadObject<UDataTable>(
-		nullptr, TEXT("/Script/Engine.DataTable'/Game/GH_Work/Data/Skill/DT_Skill.DT_Skill'"));
-
-	if (!SkillDataTable)
-	{
-		return nullptr;
-	}
-
-	FSkillField* SkillField = SkillDataTable->FindRow<FSkillField>(FName(*FString::FromInt(SkillID)), "");
-	if (!SkillField)
-	{
-		return nullptr;
-	}
-
-	return SkillField;
 }
 
 #undef LOCTEXT_NAMESPACE

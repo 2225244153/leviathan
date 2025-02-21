@@ -4,7 +4,6 @@
 #include "BattleTargetComponent.h"
 
 #include "AIStateComponent.h"
-#include "Leviathan/GameDefine.h"
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHGameFrameWork/GHBasePlayer.h"
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
@@ -13,7 +12,7 @@
 
 
 // Sets default values for this component's properties
-UBattleTargetComponent::UBattleTargetComponent() : bSearchBattleTarget(true), BattleTarget(nullptr), AlertTarget(nullptr), CurAlertValue(0)
+UBattleTargetComponent::UBattleTargetComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -30,14 +29,14 @@ void UBattleTargetComponent::BeginPlay()
 
 	Owner = Cast<AGHBaseMonster>(GetOwner());
 
-	AIStateChangedDelegateHandle = UGHCoreDelegatesMgr::OnAIStateChanged.AddUObject(this, &UBattleTargetComponent::OnAIStateChanged);
-	HurtDelegateHandle = UGHCoreDelegatesMgr::OnCharacterHurt.AddUObject(this, &UBattleTargetComponent::OnHurt);
+	UGHCoreDelegatesMgr::Get()->OnAIStateChanged.AddUniqueDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
+	UGHCoreDelegatesMgr::Get()->OnCharacterHurt.AddUniqueDynamic(this, &UBattleTargetComponent::OnHurt);
 }
 
 void UBattleTargetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UGHCoreDelegatesMgr::OnAIStateChanged.Remove(AIStateChangedDelegateHandle);
-	UGHCoreDelegatesMgr::OnCharacterHurt.Remove(HurtDelegateHandle);
+	UGHCoreDelegatesMgr::Get()->OnAIStateChanged.RemoveDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
+	UGHCoreDelegatesMgr::Get()->OnCharacterHurt.RemoveDynamic(this, &UBattleTargetComponent::OnHurt);
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -114,7 +113,7 @@ void UBattleTargetComponent::SetBattleTarget(AGHBaseCharacter* target)
 		return;
 	}
 	BattleTarget = target;
-	UGHCoreDelegatesMgr::OnBattleSearchTarget.Broadcast(BattleTarget->GetID());
+	UGHCoreDelegatesMgr::Get()->OnBattleSearchTarget.Execute(BattleTarget->GetID());
 }
 
 void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)
@@ -125,7 +124,7 @@ void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)
 	}
 	
 	BattleTarget = nullptr;
-	UGHCoreDelegatesMgr::OnBattleLoseTarget.Broadcast(loseType);
+	UGHCoreDelegatesMgr::Get()->OnBattleLoseTarget.Execute(loseType);
 }
 
 void UBattleTargetComponent::SearchBattleTarget()
@@ -207,7 +206,7 @@ void UBattleTargetComponent::StartAlert()
 		return;
 	}
 	bAlert = true;
-	UGHCoreDelegatesMgr::OnStartAlert.ExecuteIfBound();
+	UGHCoreDelegatesMgr::Get()->OnStartAlert.ExecuteIfBound();
 }
 
 void UBattleTargetComponent::FinishAlert()
@@ -219,7 +218,7 @@ void UBattleTargetComponent::FinishAlert()
 	if (CurAlertValue < 0 && AlertTarget == nullptr)
 	{
 		//丢失警戒目标退出的警戒状态
-		UGHCoreDelegatesMgr::OnFinishAlert.ExecuteIfBound();
+		UGHCoreDelegatesMgr::Get()->OnFinishAlert.ExecuteIfBound();
 	}
 	bAlert = false;
 	CurAlertValue = 0;

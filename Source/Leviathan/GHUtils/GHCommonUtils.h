@@ -29,4 +29,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GH|Utils")
 	static float Calc2DAngleByForward(AActor* myself, AActor* target);
+
+	/*
+	 *	计算权重
+	 */
+	UFUNCTION(BlueprintCallable, Category = "GH|Utils")
+	static int32 RandomIntegerByWeight(TArray<int32>& weight);
 };

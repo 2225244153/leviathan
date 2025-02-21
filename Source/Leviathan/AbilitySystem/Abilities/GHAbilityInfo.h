@@ -25,32 +25,3 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FGHAbilityInfo> AbilityInfoList;
 };
-
-USTRUCT(BlueprintType)
-struct FSkillField : public FTableRowBase
-{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 ID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName Name;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float CD;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 Weight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> AnimPath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 Distance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 Rotation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGHGameplayAbility> Ability;
-};
