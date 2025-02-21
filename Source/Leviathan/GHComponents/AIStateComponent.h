@@ -52,7 +52,9 @@ public:
 	void OnBattleLoseTarget(uint8 loseType);
 	void OnStartAlert();
 	void OnFinishAlert();
+	UFUNCTION()
 	void OnDeath(int32 sponsorId, int32 targetId);
+	UFUNCTION()
 	void OnHurt(int32 sponsorId, int32 targetId);
 	/*
 	 * CoreDelegates end
@@ -62,6 +64,8 @@ public:
 	FGameplayTag GetState();
 	UFUNCTION(BlueprintCallable)
 	void SetState(FGameplayTag state);
+	UFUNCTION(BlueprintCallable)
+	void SetStateByName(FName stateName);
 
 	/*
 	 *	寻找状态
@@ -87,10 +91,5 @@ private:
 	//当前寻找时间
 	float CurFindingTime;
 	float CurBackTime;
-
-	FDelegateHandle SearchTargetDelegateHandle;
-	FDelegateHandle LoseTargetDelegateHandle;
-	FDelegateHandle DeathDelegateHandle;
-	FDelegateHandle HurtDelegateHandle;
 };
 

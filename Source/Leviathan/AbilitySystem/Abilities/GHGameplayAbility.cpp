@@ -3,6 +3,8 @@
 
 #include "GHGameplayAbility.h"
 #include "Leviathan/AbilitySystem/Component/GHAbilitySystemComponent.h"
+#include "Leviathan/GHGameFrameWork/GHBaseCharacter.h"
+#include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
 
 DEFINE_LOG_CATEGORY(LogGHGameplayAbility)
 
@@ -54,6 +56,12 @@ void UGHGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	UE_LOG(LogGHGameplayAbility,Log,TEXT("技能结束: 技能:%s 是否被强制打断:%d"),*GetName(),bWasCancelled);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	AGHBaseCharacter* owner = Cast<AGHBaseCharacter>(ActorInfo->OwnerActor);
+	if (owner != nullptr)
+	{
+		UGHCoreDelegatesMgr::Get()->OnCharacterEndAbility.Broadcast(owner->GetID(), bWasCancelled);
+	}
 }
 
 bool UGHGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,

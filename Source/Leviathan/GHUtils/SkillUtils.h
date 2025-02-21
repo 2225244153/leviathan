@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UGHGameplayAbility> Ability;
 
-	bool IsValid()
+	bool IsValid() const
 	{
 		return ID != 0;
 	}

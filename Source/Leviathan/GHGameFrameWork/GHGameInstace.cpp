@@ -21,6 +21,11 @@ void UGHGameInstace::GHInit()
 	{
 		characterMgr->GHInit(this);
 	}
+	UGHCoreDelegatesMgr* coreDelegatesMgr = GetSubsystem<UGHCoreDelegatesMgr>(this);
+	if (coreDelegatesMgr != nullptr)
+	{
+		coreDelegatesMgr->GHInit(this);
+	}
 }
 
 void UGHGameInstace::StartGameInstance()
@@ -32,7 +37,7 @@ void UGHGameInstace::StartGameInstance()
 
 void UGHGameInstace::Shutdown()
 {
-	UGHCoreDelegatesMgr::ClearDelegates();
+	UGHCoreDelegatesMgr::Get()->ClearDelegates();
 	
 	Super::Shutdown();
 }
@@ -40,8 +45,8 @@ void UGHGameInstace::Shutdown()
 #if WITH_EDITOR
 FGameInstancePIEResult UGHGameInstace::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params)
 {
-	FGameInstancePIEResult result = Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
 	GHInit();
+	FGameInstancePIEResult result = Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
 	return result;
 }
 #endif

@@ -46,7 +46,9 @@ public:
 	/*
 	 * CoreDelegates begin
 	 */
+	UFUNCTION()
 	void OnAIStateChanged(FGameplayTag& oldTag, FGameplayTag& newTag);
+	UFUNCTION()
 	void OnHurt(int32 sponsorId, int32 targetId);
 	/*
 	 * CoreDelegates end
@@ -56,7 +58,6 @@ public:
 	AGHBaseCharacter* GetBattleTarget();
 	UFUNCTION(BlueprintCallable)
 	void SetBattleTarget(AGHBaseCharacter* target);
-	//todo监听受击直接设置攻击者为目标
 	
 	void LoseBattleTarget(ELoseTargetType loseType);
 
@@ -91,7 +92,7 @@ public:
 	float AlertFloatRatePerSecond = 20.f;
 	//丢失目标范围，超过此范围丢失目标
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
-	float LoseTargetDistance = 1500.f;
+	float LoseTargetDistance = 2000.f;
 	//发现目标的角度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
 	float SearchTargetAngle = 90.f;
@@ -117,7 +118,4 @@ private:
 	bool bAlert = false;
 	//当前警戒值
 	float CurAlertValue = 0.f;
-
-	FDelegateHandle AIStateChangedDelegateHandle;
-	FDelegateHandle HurtDelegateHandle;
 };
