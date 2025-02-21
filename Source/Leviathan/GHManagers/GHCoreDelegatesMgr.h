@@ -21,16 +21,7 @@ class LEVIATHAN_API UGHCoreDelegatesMgr : public UGameInstanceSubsystem
 
 public:
 	UGHCoreDelegatesMgr();
-	
-private:
-	static UGHGameInstace* Inst;
-	
-public:
-	UFUNCTION(BlueprintCallable)
-	static UGHCoreDelegatesMgr* Get();
 
-	void GHInit(UGHGameInstace* inst);
-	
 	void ClearDelegates();
 	/*
 	 *	BattleTargetComponent发现目标广播

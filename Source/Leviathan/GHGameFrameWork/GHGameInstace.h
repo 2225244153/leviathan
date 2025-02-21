@@ -19,6 +19,12 @@ public:
 	~UGHGameInstace();
 
 	void GHInit();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=GHGameInstace)
+	class UGHCharacterMgr* CharacterMgr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=GHGameInstace)
+	class UGHCoreDelegatesMgr* CoreDelegatesMgr;
+	
 protected:
 	virtual void StartGameInstance() override;
 	virtual void Shutdown() override;

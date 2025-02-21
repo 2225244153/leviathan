@@ -25,10 +25,7 @@ class LEVIATHAN_API UGHCharacterMgr : public UGameInstanceSubsystem
 public:
 	UGHCharacterMgr();
 
-	UFUNCTION(BlueprintCallable)
-	static UGHCharacterMgr* Get();
-
-	void GHInit(UGHGameInstace* inst);
+	void GHInit();
 	
 	void virtual Initialize(FSubsystemCollectionBase& Collection) override;
 	void virtual Deinitialize() override;
@@ -47,9 +44,8 @@ public:
 
 	void RegisterCharacter(AGHBaseCharacter* character);
 	void UnregisterCharacter(AGHBaseCharacter* character);
-private:
-	static UGHGameInstace* Inst;
 	
+private:
 	UPROPERTY()
 	TMap<int32, AGHBaseCharacter*> AllCharacters;
 	UPROPERTY()

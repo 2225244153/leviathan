@@ -37,24 +37,26 @@ void UAIStateComponent::BeginPlay()
 
 	Owner = Cast<AGHBaseMonster>(GetOwner());
 
-	UGHCoreDelegatesMgr::Get()->OnBattleSearchTarget.BindUObject(this, &UAIStateComponent::OnBattleSearchTarget);
-	UGHCoreDelegatesMgr::Get()->OnBattleLoseTarget.BindUObject(this, &UAIStateComponent::OnBattleLoseTarget);
-	UGHCoreDelegatesMgr::Get()->OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
-	UGHCoreDelegatesMgr::Get()->OnFinishAlert.BindUObject(this, &UAIStateComponent::OnFinishAlert);
-	UGHCoreDelegatesMgr::Get()->OnCharacterDeath.AddUniqueDynamic(this, &UAIStateComponent::OnDeath);
-	UGHCoreDelegatesMgr::Get()->OnCharacterHurt.AddUniqueDynamic(this, &UAIStateComponent::OnHurt);
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	coreDelegatesMgr->OnBattleSearchTarget.BindUObject(this, &UAIStateComponent::OnBattleSearchTarget);
+	coreDelegatesMgr->OnBattleLoseTarget.BindUObject(this, &UAIStateComponent::OnBattleLoseTarget);
+	coreDelegatesMgr->OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
+	coreDelegatesMgr->OnFinishAlert.BindUObject(this, &UAIStateComponent::OnFinishAlert);
+	coreDelegatesMgr->OnCharacterDeath.AddUniqueDynamic(this, &UAIStateComponent::OnDeath);
+	coreDelegatesMgr->OnCharacterHurt.AddUniqueDynamic(this, &UAIStateComponent::OnHurt);
 
 	SetState(AI_Monster_State_Init);
 }
 
 void UAIStateComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UGHCoreDelegatesMgr::Get()->OnBattleSearchTarget.Unbind();
-	UGHCoreDelegatesMgr::Get()->OnBattleLoseTarget.Unbind();
-	UGHCoreDelegatesMgr::Get()->OnStartAlert.Unbind();
-	UGHCoreDelegatesMgr::Get()->OnFinishAlert.Unbind();
-	UGHCoreDelegatesMgr::Get()->OnCharacterDeath.RemoveDynamic(this, &UAIStateComponent::OnDeath);
-	UGHCoreDelegatesMgr::Get()->OnCharacterHurt.RemoveDynamic(this, &UAIStateComponent::OnHurt);
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	coreDelegatesMgr->OnBattleSearchTarget.Unbind();
+	coreDelegatesMgr->OnBattleLoseTarget.Unbind();
+	coreDelegatesMgr->OnStartAlert.Unbind();
+	coreDelegatesMgr->OnFinishAlert.Unbind();
+	coreDelegatesMgr->OnCharacterDeath.RemoveDynamic(this, &UAIStateComponent::OnDeath);
+	coreDelegatesMgr->OnCharacterHurt.RemoveDynamic(this, &UAIStateComponent::OnHurt);
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -76,7 +78,8 @@ void UAIStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void UAIStateComponent::OnBattleSearchTarget(int32 targetId)
 {
-	AGHBaseCharacter* target = UGHCharacterMgr::Get()->GetCharacter(targetId);
+	UGHCharacterMgr* characterMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CharacterMgr;
+	AGHBaseCharacter* target = characterMgr->GetCharacter(targetId);
 	if (target == nullptr)
 	{
 		return;
@@ -152,7 +155,8 @@ void UAIStateComponent::SetState(FGameplayTag state)
 	FGameplayTag oldTag = TagState;
 	TagState = state;
 
-	UGHCoreDelegatesMgr::Get()->OnAIStateChanged.Broadcast(oldTag, TagState);
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	coreDelegatesMgr->OnAIStateChanged.Broadcast(oldTag, TagState);
 
 	if (state == AI_Monster_State_Find)
 	{

@@ -8,21 +8,12 @@
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHGameFrameWork/GHBasePlayer.h"
 
-UGHGameInstace* UGHCharacterMgr::Inst = nullptr;
-
 UGHCharacterMgr::UGHCharacterMgr()
 {
 }
 
-UGHCharacterMgr* UGHCharacterMgr::Get()
+void UGHCharacterMgr::GHInit()
 {
-	return UGameInstance::GetSubsystem<UGHCharacterMgr>(Inst);
-}
-
-void UGHCharacterMgr::GHInit(UGHGameInstace* inst)
-{
-	Inst = inst;
-
 	// 扫描当前场景中的所有 Actor
 	UWorld* World = GetWorld();
 	if (World)

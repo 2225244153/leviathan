@@ -1,21 +1,7 @@
 #include "GHCoreDelegatesMgr.h"
 
-#include "Leviathan/GHGameFrameWork/GHGameInstace.h"
-
-UGHGameInstace* UGHCoreDelegatesMgr::Inst = nullptr;
-
 UGHCoreDelegatesMgr::UGHCoreDelegatesMgr()
 {
-}
-
-UGHCoreDelegatesMgr* UGHCoreDelegatesMgr::Get()
-{
-	return UGameInstance::GetSubsystem<UGHCoreDelegatesMgr>(Inst);
-}
-
-void UGHCoreDelegatesMgr::GHInit(UGHGameInstace* inst)
-{
-	Inst = inst;
 }
 
 void UGHCoreDelegatesMgr::ClearDelegates()

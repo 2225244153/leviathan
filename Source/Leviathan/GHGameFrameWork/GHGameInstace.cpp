@@ -16,28 +16,27 @@ UGHGameInstace::~UGHGameInstace()
 
 void UGHGameInstace::GHInit()
 {
-	UGHCharacterMgr* characterMgr = GetSubsystem<UGHCharacterMgr>(this);
-	if (characterMgr != nullptr)
+	CharacterMgr = GetSubsystem<UGHCharacterMgr>(this);
+	if (CharacterMgr != nullptr)
 	{
-		characterMgr->GHInit(this);
+		CharacterMgr->GHInit();
 	}
-	UGHCoreDelegatesMgr* coreDelegatesMgr = GetSubsystem<UGHCoreDelegatesMgr>(this);
-	if (coreDelegatesMgr != nullptr)
-	{
-		coreDelegatesMgr->GHInit(this);
-	}
+	CoreDelegatesMgr = GetSubsystem<UGHCoreDelegatesMgr>(this);
 }
 
 void UGHGameInstace::StartGameInstance()
 {
-	Super::StartGameInstance();
-
 	GHInit();
+	
+	Super::StartGameInstance();
 }
 
 void UGHGameInstace::Shutdown()
 {
-	UGHCoreDelegatesMgr::Get()->ClearDelegates();
+	if (CoreDelegatesMgr != nullptr)
+	{
+		CoreDelegatesMgr->ClearDelegates();
+	}
 	
 	Super::Shutdown();
 }

@@ -44,7 +44,8 @@ void AGHGameModeBase::TickTimer()
 	if (bDebugTargetRange || bDebugAIPurse || bDebugBornRange)
 	{
 		TArray<AGHBaseMonster*> monsters;
-		UGHCharacterMgr::Get()->GetAllMonsters(monsters);
+		UGHCharacterMgr* characterMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CharacterMgr;
+		characterMgr->GetAllMonsters(monsters);
 		for (auto& monster : monsters)
 		{
 			AGHBaseAIController* aiController = Cast<AGHBaseAIController>(monster->GetController());
@@ -79,7 +80,8 @@ void AGHGameModeBase::TickTimer()
 void AGHGameModeBase::GHDebugPauseAI(int32 active)
 {
 	TArray<AGHBaseMonster*> monsters;
-	UGHCharacterMgr::Get()->GetAllMonsters(monsters);
+	UGHCharacterMgr* characterMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CharacterMgr;
+	characterMgr->GetAllMonsters(monsters);
 	for (auto& monster : monsters)
 	{
 		AGHBaseAIController* aiController = Cast<AGHBaseAIController>(monster->GetController());
