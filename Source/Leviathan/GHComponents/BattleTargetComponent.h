@@ -42,6 +42,7 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/*
 	 * CoreDelegates begin
@@ -92,10 +93,10 @@ public:
 	float AlertFloatRatePerSecond = 20.f;
 	//丢失目标范围，超过此范围丢失目标
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
-	float LoseTargetDistance = 2000.f;
+	float LoseTargetDistance = 1500.f;
 	//发现目标的角度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
-	float SearchTargetAngle = 90.f;
+	float SearchTargetAngle = 60.f;
 	//搜寻目标警戒最大范围
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SearchTargetParams")
 	float SearchTargetWarnMaxDistance = 1000.f;
@@ -104,9 +105,9 @@ public:
 	float BackDistance = 3000.f;
 	
 private:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	AGHBaseCharacter* BattleTarget;
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	AGHBaseCharacter* AlertTarget;
 	UPROPERTY()
 	AGHBaseMonster* Owner;

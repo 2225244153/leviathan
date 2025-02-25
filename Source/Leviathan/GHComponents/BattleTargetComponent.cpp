@@ -4,11 +4,13 @@
 #include "BattleTargetComponent.h"
 
 #include "AIStateComponent.h"
+#include "Leviathan/GameDefine.h"
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHGameFrameWork/GHBasePlayer.h"
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
 #include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
 #include "Leviathan/GHUtils/GHCommonUtils.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values for this component's properties
@@ -29,16 +31,22 @@ void UBattleTargetComponent::BeginPlay()
 
 	Owner = Cast<AGHBaseMonster>(GetOwner());
 
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
-	coreDelegatesMgr->OnAIStateChanged.AddUniqueDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
-	coreDelegatesMgr->OnCharacterHurt.AddUniqueDynamic(this, &UBattleTargetComponent::OnHurt);
+	EXECUTE_ON_SERVER
+	{
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		coreDelegatesMgr->OnAIStateChanged.AddUniqueDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
+		coreDelegatesMgr->OnCharacterHurt.AddUniqueDynamic(this, &UBattleTargetComponent::OnHurt);
+	}
 }
 
 void UBattleTargetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
-	coreDelegatesMgr->OnAIStateChanged.RemoveDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
-	coreDelegatesMgr->OnCharacterHurt.RemoveDynamic(this, &UBattleTargetComponent::OnHurt);
+	EXECUTE_ON_SERVER
+	{
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		coreDelegatesMgr->OnAIStateChanged.RemoveDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
+		coreDelegatesMgr->OnCharacterHurt.RemoveDynamic(this, &UBattleTargetComponent::OnHurt);
+	}
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -48,18 +56,37 @@ void UBattleTargetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void UBattleTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if (bSearchBattleTarget)
-	{
-		SearchBattleTarget();
-	}
-	else
-	{
-		LoseBattleTarget(ELoseTargetType::E_LoseTargetType_Normal);
-	}
 
-	UpdateAlert(DeltaTime);
-	CheckBackDistance();
+	EXECUTE_ON_SERVER
+	{
+		if (bSearchBattleTarget)
+		{
+			SearchBattleTarget();
+		}
+		else
+		{
+			LoseBattleTarget(ELoseTargetType::E_LoseTargetType_Normal);
+		}
+
+		UpdateAlert(DeltaTime);
+		CheckBackDistance();
+	}
+}
+
+void UBattleTargetComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UBattleTargetComponent, BattleTarget);
+	DOREPLIFETIME(UBattleTargetComponent, AlertTarget);
+
+	// FDoRepLifetimeParams repLifetimeParams;
+	// repLifetimeParams.Condition = COND_OwnerOnly;
+	// repLifetimeParams.RepNotifyCondition = REPNOTIFY_OnChanged;
+	// repLifetimeParams.bIsPushBased = true;
+	// DOREPLIFETIME_WITH_PARAMS(UBattleTargetComponent, BattleTarget, repLifetimeParams);
+	//
+	// DOREPLIFETIME_CONDITION(UBattleTargetComponent, BattleTarget, COND_OwnerOnly);
 }
 
 void UBattleTargetComponent::OnAIStateChanged(FGameplayTag& oldTag, FGameplayTag& newTag)
@@ -105,6 +132,11 @@ AGHBaseCharacter* UBattleTargetComponent::GetBattleTarget()
 
 void UBattleTargetComponent::SetBattleTarget(AGHBaseCharacter* target)
 {
+	EXECUTE_ON_CLIENT
+	{
+		return;
+	}
+	
 	if (target == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GH---BattleTargetComponent::SetBattleTarget: target is null!!!"));
@@ -123,6 +155,10 @@ void UBattleTargetComponent::SetBattleTarget(AGHBaseCharacter* target)
 
 void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)
 {
+	EXECUTE_ON_CLIENT
+	{
+		return;
+	}
 	if (BattleTarget == nullptr)
 	{
 		return;
@@ -136,6 +172,10 @@ void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)
 
 void UBattleTargetComponent::SearchBattleTarget()
 {
+	EXECUTE_ON_CLIENT
+	{
+		return;
+	}
 	//目标不合法才需要重新查找目标，demo暂不支持切换目标的逻辑
 	if (CheckTargetValid())
 	{
@@ -209,6 +249,10 @@ bool UBattleTargetComponent::CheckTargetValid()
 
 void UBattleTargetComponent::StartAlert()
 {
+	EXECUTE_ON_CLIENT
+	{
+		return;
+	}
 	if (bAlert)
 	{
 		return;
@@ -259,6 +303,10 @@ void UBattleTargetComponent::UpdateAlert(float DeltaTime)
 
 void UBattleTargetComponent::SetAlertTarget(AGHBaseCharacter* alertTarget)
 {
+	EXECUTE_ON_CLIENT
+	{
+		return;
+	}
 	if (alertTarget != nullptr)
 	{
 		StartAlert();

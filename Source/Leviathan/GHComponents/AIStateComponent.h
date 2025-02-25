@@ -44,6 +44,7 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/*
 	 * CoreDelegates begin
@@ -64,8 +65,6 @@ public:
 	FGameplayTag GetState();
 	UFUNCTION(BlueprintCallable)
 	void SetState(FGameplayTag state);
-	UFUNCTION(BlueprintCallable)
-	void SetStateByName(FName stateName);
 
 	/*
 	 *	寻找状态
@@ -78,7 +77,7 @@ public:
 	void CheckBackBornLocation(float DeltaTime);
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIStateParams")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AIStateParams")
 	FGameplayTag TagState;
 	//最大寻找时间，超过此寻找时间返回出生点
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIStateParams")

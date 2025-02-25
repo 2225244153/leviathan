@@ -7,6 +7,11 @@
 
 TMap<int32, FSkillData> USkillUtils::SkillDatas;
 
+void USkillUtils::ClearCacheDatas()
+{
+	SkillDatas.Empty();
+}
+
 FSkillData USkillUtils::GetSkillDataBySkillID(int32 skillID)
 {
 	FSkillData* skillDataPtr = SkillDatas.Find(skillID);

@@ -3,6 +3,8 @@
 
 #include "GHBaseCharacter.h"
 
+#include "Net/UnrealNetwork.h"
+
 int32 AGHBaseCharacter::IDFlag = 0;
 
 // Sets default values
@@ -41,6 +43,13 @@ void AGHBaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AGHBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AGHBaseCharacter, ID, COND_InitialOnly);
+}
+
 int32 AGHBaseCharacter::GetID()
 {
 	return ID;
@@ -49,6 +58,21 @@ int32 AGHBaseCharacter::GetID()
 UAbilitySystemComponent* AGHBaseCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+bool AGHBaseCharacter::NetMulticast_PlayAnimMontage_Validate(UAnimMontage* montage)
+{
+	return montage->IsValidLowLevelFast();
+}
+
+void AGHBaseCharacter::NetMulticast_StopAnimMontage_Implementation(class UAnimMontage* AnimMontage)
+{
+	StopAnimMontage(AnimMontage);
+}
+
+void AGHBaseCharacter::NetMulticast_PlayAnimMontage_Implementation(UAnimMontage* montage)
+{
+	PlayAnimMontage(montage);
 }
 
 void AGHBaseCharacter::InitAbilitySystemComponent(AActor* OwnerActor)

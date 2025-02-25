@@ -53,6 +53,8 @@ class LEVIATHAN_API USkillUtils : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	static void ClearCacheDatas();
+	
 	UFUNCTION(BlueprintCallable, Category = "GH|SkillUtils")
 	static FSkillData GetSkillDataBySkillID(int32 skillID);
 

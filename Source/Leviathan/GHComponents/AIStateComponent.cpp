@@ -2,10 +2,12 @@
 #include "AIStateComponent.h"
 
 #include "BattleTargetComponent.h"
+#include "Leviathan/GameDefine.h"
 #include "Leviathan/GHGameFrameWork/GHBaseMonster.h"
 #include "Leviathan/GHManagers/GHCharacterMgr.h"
 #include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
 #include "Leviathan/GHUtils/GHCommonUtils.h"
+#include "Net/UnrealNetwork.h"
 
 UE_DEFINE_GAMEPLAY_TAG(AI_Monster_State_Init, "AI.State.Init");
 UE_DEFINE_GAMEPLAY_TAG(AI_Monster_State_Alert, "AI.State.Alert");
@@ -37,26 +39,32 @@ void UAIStateComponent::BeginPlay()
 
 	Owner = Cast<AGHBaseMonster>(GetOwner());
 
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
-	coreDelegatesMgr->OnBattleSearchTarget.BindUObject(this, &UAIStateComponent::OnBattleSearchTarget);
-	coreDelegatesMgr->OnBattleLoseTarget.BindUObject(this, &UAIStateComponent::OnBattleLoseTarget);
-	coreDelegatesMgr->OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
-	coreDelegatesMgr->OnFinishAlert.BindUObject(this, &UAIStateComponent::OnFinishAlert);
-	coreDelegatesMgr->OnCharacterDeath.AddUniqueDynamic(this, &UAIStateComponent::OnDeath);
-	coreDelegatesMgr->OnCharacterHurt.AddUniqueDynamic(this, &UAIStateComponent::OnHurt);
+	EXECUTE_ON_SERVER
+	{
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		coreDelegatesMgr->OnBattleSearchTarget.BindUObject(this, &UAIStateComponent::OnBattleSearchTarget);
+		coreDelegatesMgr->OnBattleLoseTarget.BindUObject(this, &UAIStateComponent::OnBattleLoseTarget);
+		coreDelegatesMgr->OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
+		coreDelegatesMgr->OnFinishAlert.BindUObject(this, &UAIStateComponent::OnFinishAlert);
+		coreDelegatesMgr->OnCharacterDeath.AddUniqueDynamic(this, &UAIStateComponent::OnDeath);
+		coreDelegatesMgr->OnCharacterHurt.AddUniqueDynamic(this, &UAIStateComponent::OnHurt);
 
-	SetState(AI_Monster_State_Init);
+		SetState(AI_Monster_State_Init);
+	}
 }
 
 void UAIStateComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
-	coreDelegatesMgr->OnBattleSearchTarget.Unbind();
-	coreDelegatesMgr->OnBattleLoseTarget.Unbind();
-	coreDelegatesMgr->OnStartAlert.Unbind();
-	coreDelegatesMgr->OnFinishAlert.Unbind();
-	coreDelegatesMgr->OnCharacterDeath.RemoveDynamic(this, &UAIStateComponent::OnDeath);
-	coreDelegatesMgr->OnCharacterHurt.RemoveDynamic(this, &UAIStateComponent::OnHurt);
+	EXECUTE_ON_SERVER
+	{
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+    	coreDelegatesMgr->OnBattleSearchTarget.Unbind();
+    	coreDelegatesMgr->OnBattleLoseTarget.Unbind();
+    	coreDelegatesMgr->OnStartAlert.Unbind();
+    	coreDelegatesMgr->OnFinishAlert.Unbind();
+    	coreDelegatesMgr->OnCharacterDeath.RemoveDynamic(this, &UAIStateComponent::OnDeath);
+    	coreDelegatesMgr->OnCharacterHurt.RemoveDynamic(this, &UAIStateComponent::OnHurt);
+	}
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -66,14 +74,24 @@ void UAIStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bFinding)
+	EXECUTE_ON_SERVER
 	{
-		UpdateFindingTime(DeltaTime);
+		if (bFinding)
+		{
+			UpdateFindingTime(DeltaTime);
+		}
+		if (TagState == AI_Monster_State_Back)
+		{
+			CheckBackBornLocation(DeltaTime);
+		}
 	}
-	if (TagState == AI_Monster_State_Back)
-	{
-		CheckBackBornLocation(DeltaTime);
-	}
+}
+
+void UAIStateComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UAIStateComponent, TagState);
 }
 
 void UAIStateComponent::OnBattleSearchTarget(int32 targetId)
@@ -142,6 +160,10 @@ FGameplayTag UAIStateComponent::GetState()
 
 void UAIStateComponent::SetState(FGameplayTag state)
 {
+	EXECUTE_ON_CLIENT
+	{
+		return;
+	}
 	if (TagState.IsValid())
 	{
 		FGameplayTagContainer tagContainer = TagState.GetGameplayTagParents();
@@ -165,15 +187,6 @@ void UAIStateComponent::SetState(FGameplayTag state)
 	else if (state == AI_Monster_State_Back)
 	{
 		CurBackTime = 0;
-	}
-}
-
-void UAIStateComponent::SetStateByName(FName stateName)
-{
-	FGameplayTag tag = UGameplayTagsManager::Get().RequestGameplayTag(stateName);
-	if (tag.IsValid())
-	{
-		SetState(tag);
 	}
 }
 

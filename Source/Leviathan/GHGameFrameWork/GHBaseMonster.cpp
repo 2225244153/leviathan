@@ -31,6 +31,8 @@ AGHBaseMonster::AGHBaseMonster()
 
 	TargetComponent = CreateDefaultSubobject<UBattleTargetComponent>(TEXT("TargetComponent"));
 	StateComponent = CreateDefaultSubobject<UAIStateComponent>(TEXT("StateComponent"));
+	TargetComponent->SetIsReplicated(true);
+	StateComponent->SetIsReplicated(true);
 }
 
 // Called when the game starts or when spawned

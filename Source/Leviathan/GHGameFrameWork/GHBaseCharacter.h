@@ -24,6 +24,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -40,10 +41,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	UGHAbilitySystemComponent* AbilitySystemComponent;
 
+	UFUNCTION(BlueprintCallable, NetMulticast, Unreliable, WithValidation)
+	void NetMulticast_PlayAnimMontage(UAnimMontage* montage);
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void NetMulticast_StopAnimMontage(class UAnimMontage* AnimMontage = nullptr);
+
 private:
 	bool ASCInitialized = false;
 
 private:
 	static int32 IDFlag;
+
+	UPROPERTY(Replicated)
 	int32 ID; //唯一id，标识一个Character
 };
