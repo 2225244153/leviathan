@@ -10,13 +10,12 @@ require "UnLua"
 local BTS_Monster_PHZ_BattleService = Class()
 
 function BTS_Monster_PHZ_BattleService:ReceiveActivationAI(OwnerController, ControlledPawn)
-    print('hsp----------BTS_Monster_PHZ_BattleService:ReceiveActivationAI')
     UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, self.Target)
 end
 
 function BTS_Monster_PHZ_BattleService:ReceiveDeactivationAI(OwnerController, ControlledPawn)
-    print('hsp----------BTS_Monster_PHZ_BattleService:ReceiveDeactivationAI')
     UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, nil)
+    UE4.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, 0)
 end
 
 function BTS_Monster_PHZ_BattleService:ReceiveSearchStartAI(OwnerController, ControlledPawn)
@@ -32,10 +31,22 @@ function BTS_Monster_PHZ_BattleService:ReceiveSearchStartAI(OwnerController, Con
 end
 
 function BTS_Monster_PHZ_BattleService:ReceiveTickAI(OwnerController, ControlledPawn, DeltaSeconds)
-
+    local bBattleTag = UE.UBlueprintGameplayTagLibrary.MatchesTag(self.Monster.StateComponent:GetState(), self.BattleTag, false)
+    if not bBattleTag then
+        return
+    end
+    if self.Target == nil then
+        return
+    end
+    self:GetUsableSkillID()
+    self:CheckBattleState()
 end
 
 function BTS_Monster_PHZ_BattleService:GetUsableSkillID()
+    if self.SkillID  ~= nil and self.SkillID ~= 0 then
+        return
+    end
+    
     self.SkillID = 0
     local usableSkillIDs = self.Monster.AbilitySystemComponent:GetUsableAbilities()
     local usableSkillIDsNum = usableSkillIDs:Num()
@@ -56,28 +67,24 @@ end
 function BTS_Monster_PHZ_BattleService:CheckBattleState()
     --1.没有可用技能，执行战斗表演
     if self.SkillID == 0 then
-        self:SetBattleState('AI.State.Battle.Perform')
+        self.Monster.StateComponent:SetState(self.BattlePerformTag)
         return
     end
     local skillData = UE4.USkillUtils.GetSkillDataBySkillID(self.SkillID)
     --2.判断距离是否足够释放技能，不够则执行追击
     local distance = UE4.UGHCommonUtils.CalcDistance(self.Monster, self.Target)
     if distance > skillData.Distance then
-        self:SetBattleState('AI.State.Battle.Pursue')
+        self.Monster.StateComponent:SetState(self.BattlePursueTag)
         return
     end
     --3.距离足够判断角度是否满足释放技能，不够则执行旋转
     local angle = UE4.UGHCommonUtils.Calc2DAngleByForward(self.Monster, self.Target)
-    if angle > skillData.Rotation then
-        self:SetBattleState('AI.State.Battle.Turn')
+    if angle > (skillData.Rotation / 2) then
+        self.Monster.StateComponent:SetState(self.BattleTurnTag)
         return
     end
     --4.条件都满足释放技能
-    self:SetBattleState('AI.State.Battle.Attack')
-end
-
-function BTS_Monster_PHZ_BattleService:SetBattleState(stateName)
-    self.Monster.StateComponent:SetStateByName(stateName)
+    self.Monster.StateComponent:SetState(self.BattleAttackTag)
 end
 
 return BTS_Monster_PHZ_BattleService
