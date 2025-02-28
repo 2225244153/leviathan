@@ -36,9 +36,6 @@ struct FGHAnimSkillMontagePlayer
 	float PlayMontageRate = 1.f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Action|Montage")
-	TArray<FGHMontageStartSection> PlayMontageStartSection;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Action|Montage")
 	float PlayMontageStartTimeSeconds = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Action|Montage")
@@ -68,8 +65,7 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                        const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility,
 	                        bool bWasCancelled) override;
-
-
+	
 	/**
 	 * @brief 创建一个简单的蒙太奇播放器
 	 * @param montage_tag 

@@ -4,7 +4,6 @@
 #include "AbilitySystemGlobals.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
-#include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "Leviathan/AbilitySystem/AbilityTask/GHAbilityTaskPlayMontageAndWait.h"
 #include "Leviathan/AbilitySystem/TargetActor/GHTargetActor.h"
 #include "Leviathan/Animation/GHAnimationLib.h"
@@ -57,7 +56,6 @@ UGHAbilityTaskPlayMontageAndWait* UGHAnimSkillAbility::CreateMontagePlayer(
 		UGHAbilityTaskPlayMontageAndWait::CreateGHPlayMontageAndWaitProxy(
 			this, "PlayMontageTask", anim_montage_info->AnimMontage, play_rate * anim_montage_info->PlayRate,
 			start_section, stop_when_ability_end, root_motion_translation_scale, start_seconds);
-	check(montage_player);
 
 	return montage_player;
 }
@@ -76,7 +74,6 @@ void UGHAnimSkillAbility::ActiveTargetActor(TSubclassOf<AGHTargetActor> target_a
 {
 	if (target_actor_class)
 	{
-		//TODO: 客户端需要监听TAG控制Confirm和Cancel事件。
 		SpawnAndWaitTargetData(TargetingConfirmation, target_actor_class);
 	}
 }
@@ -85,7 +82,6 @@ void UGHAnimSkillAbility::SpawnAndWaitTargetData(TEnumAsByte<EGameplayTargetingC
                                                  TSubclassOf<AGHTargetActor> target_actor_class)
 {
 	LOG_INFO("SpawnAndWaitTargetData...");
-
 	CurrentTargetDataTask = UAbilityTask_WaitTargetData::WaitTargetData(this, "Targeting", confirmation_type,
 	                                                                    target_actor_class);
 
@@ -96,7 +92,6 @@ void UGHAnimSkillAbility::SpawnAndWaitTargetData(TEnumAsByte<EGameplayTargetingC
 
 	if (CurrentTargetDataTask->BeginSpawningActor(this, TargetActorClass, ability_target_actor))
 	{
-		// 可以在这里初始化一些参数
 		CurrentTargetDataTask->FinishSpawningActor(this, ability_target_actor);
 		CurrentTargetActor = Cast<AGHTargetActor>(ability_target_actor);
 		CurrentTargetActor->SetActorTransform(GetAvatarActorFromActorInfo()->GetTransform());
@@ -145,7 +140,6 @@ void UGHAnimSkillAbility::OnReceiveTargetData(const FGameplayAbilityTargetDataHa
 					target_actor->GetComponentByClass(USkillKnockComponent::StaticClass()));
 				FKnockInfo knock_info;
 
-				//TODO:暂时使用伪数据
 				knock_info.Direction = target_actor->GetActorLocation() - source_actor->GetActorLocation();
 				knock_info.bForceMove = true;
 				knock_comp->ActivateKnock(
@@ -227,7 +221,7 @@ bool UGHAnimSkillAbility::InitAnimMontagePlayer(FGHAnimSkillMontagePlayer& anim_
 	CurrentMontagePlayer = &anim_skill_montage_player;
 
 	EndAnimMontagePlayer(anim_skill_montage_player);
-
+	
 	// 设置当前的动作蒙太奇tag
 	CurrentActionMontageTag = anim_skill_montage_player.ActionMontageTag;
 
@@ -263,7 +257,6 @@ void UGHAnimSkillAbility::OnActionCompleted_Implementation()
 {
 	if (AnimBeforeMontagePlayer.ActionMontagePlayer)
 	{
-		// 当前正在播放的是否Before
 		if (CurrentActionMontageTag == AnimBeforeMontagePlayer.ActionMontageTag)
 		{
 			EndAnimMontagePlayer(AnimBeforeMontagePlayer);
@@ -283,7 +276,6 @@ void UGHAnimSkillAbility::OnActionCompleted_Implementation()
 
 void UGHAnimSkillAbility::OnActionInterrupted_Implementation()
 {
-	//打断本身也会调用End，不用再额外调用了
 	EndCurrentAbility(false, true);
 }
 

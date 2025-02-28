@@ -23,7 +23,6 @@ void UGHAttributeSetBase::ScaleAttributeWithMax(const FGameplayAttributeData& at
                                                     const FGameplayAttributeData& max_attribute_data) const
 {
 	const float current_max_value = max_attribute_data.GetCurrentValue();
-	//LOG_INFO("max:%f - cm:%f"), new_max_value, current_max_value);
 
 	if (!FMath::IsNearlyEqual(current_max_value, new_max_value))
 	{
@@ -81,6 +80,7 @@ void UGHHealthAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION_NOTIFY(UGHHealthAttributeSet, Health, COND_None, REPNOTIFY_OnChanged);
+	DOREPLIFETIME_CONDITION_NOTIFY(UGHHealthAttributeSet, MaxHealth, COND_None, REPNOTIFY_OnChanged);
 }
 
 void UGHHealthAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -91,6 +91,11 @@ void UGHHealthAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribu
 void UGHHealthAttributeSet::OnRepHealth(const FGameplayAttributeData& old_value)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGHHealthAttributeSet, Health, old_value);
+}
+
+void UGHHealthAttributeSet::OnRepMaxHealth(const FGameplayAttributeData& old_value)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGHHealthAttributeSet, MaxHealth, old_value);
 }
 
 void UGHAttackAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -3,6 +3,8 @@
 
 #include "GHBaseCharacter.h"
 
+#include "Leviathan/GHComponents/SkillKnockComponent.h"
+#include "Leviathan/Log/GHLog.h"
 #include "Net/UnrealNetwork.h"
 
 int32 AGHBaseCharacter::IDFlag = 0;
@@ -22,7 +24,10 @@ AGHBaseCharacter::AGHBaseCharacter()
 	// Ability System Component.
 	AbilitySystemComponent = CreateDefaultSubobject<UGHAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	SkillKnockComponent = CreateDefaultSubobject<USkillKnockComponent>(TEXT("SkillKnockComponent"));
+	SkillKnockComponent->SetIsReplicated(true);
 }
 
 // Called when the game starts or when spawned
@@ -69,6 +74,11 @@ FGHAnimMontageInfo* AGHBaseCharacter::GetAnimMontageInfo(FGameplayTag GameplayTa
 	}
 
 	FGHAnimMontageInfo* montage_info = AnimationLib->AnimMontages.Find(GameplayTag);
+	if (!montage_info)
+	{
+		LOG_INFO("动画库：%s缺少GameplayTag为:%s的配置！",*AnimationLib->GetName(), *GameplayTag.ToString());
+		return nullptr;
+	}
 	return montage_info;
 }
 

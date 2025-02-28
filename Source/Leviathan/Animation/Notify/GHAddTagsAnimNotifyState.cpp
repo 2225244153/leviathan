@@ -5,7 +5,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 
-#if WITH_EDITOR
 void UGHAddTagsAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                             float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
@@ -71,6 +70,7 @@ void UGHAddTagsAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAni
 	}
 }
 
+#if WITH_EDITOR
 FString UGHAddTagsAnimNotifyState::GetNotifyName_Implementation() const
 {
 	if (AddTagContainer.IsValidIndex(0))

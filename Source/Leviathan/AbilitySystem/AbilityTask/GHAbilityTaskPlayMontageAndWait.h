@@ -16,7 +16,7 @@ class LEVIATHAN_API UGHAbilityTaskPlayMontageAndWait : public UAbilityTask_PlayM
 	
 public:
 	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName="DarwinPlayMontageAndWait", HidePin = "owning_ability", DefaultToSelf = "owning_ability",
+		meta = (DisplayName="GHAbilityTaskPlayMontageAndWait", HidePin = "owning_ability", DefaultToSelf = "owning_ability",
 			BlueprintInternalUseOnly = "TRUE"))
 	static UGHAbilityTaskPlayMontageAndWait* CreateGHPlayMontageAndWaitProxy(
 		UGameplayAbility* owning_ability,

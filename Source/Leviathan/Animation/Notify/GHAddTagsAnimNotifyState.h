@@ -8,20 +8,19 @@
 
 /**
  * 添加Tags ANS.
- * 
  */
 UCLASS(Blueprintable, BlueprintType)
 class LEVIATHAN_API UGHAddTagsAnimNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()
-
+	
 public:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,
 	                         const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 	                       const FAnimNotifyEventReference& EventReference) override;
-
 #if WITH_EDITOR
+
 	// Overridden from UAnimNotifyState to provide custom notify name.
 	virtual FString GetNotifyName_Implementation() const override;
 #endif

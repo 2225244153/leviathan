@@ -4,6 +4,7 @@
 #include "SkillKnockComponent.h"
 
 #include "Leviathan/GHGameFrameWork/GHBaseCharacter.h"
+#include "Leviathan/Log/GHLog.h"
 
 
 // Sets default values for this component's properties
@@ -43,7 +44,13 @@ void USkillKnockComponent::ActivateKnock(const FKnockInfo& knock_info, const FVe
 	CurrentKnockInfo.KnockForceMoveInfo.Direction = dir;
 	CurrentKnockInfo.KnockForceMoveInfo.EnableGravity = false;
 	IAbilitySystemInterface* ability_system_interface = Cast<IAbilitySystemInterface>(GetOwner());
-	bool is_success = ability_system_interface->GetAbilitySystemComponent()->TryActivateAbilityByClass(
+
+	if (!DefaultKnockAbility)
+	{
+		ensureMsgf(false, TEXT("Unable To Find Knock Ability"));
+		return;
+	}
+	ability_system_interface->GetAbilitySystemComponent()->TryActivateAbilityByClass(
 		DefaultKnockAbility);
 }
 

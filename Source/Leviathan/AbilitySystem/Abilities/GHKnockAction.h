@@ -1,6 +1,4 @@
-﻿// Copyright Relink Games, Inc. All Rights Reserved. 
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GHAnimSkillAbility.h"
@@ -18,8 +16,6 @@ class LEVIATHAN_API UGHKnockAction : public UGHAnimSkillAbility
 	GENERATED_BODY()
 
 public:
-	UGHKnockAction(const FObjectInitializer& object_initializer);
-
 	const FFloatCurve* FindHitRecoverCurve(const FGameplayTag& montage_tag, const FName& curve_name);
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

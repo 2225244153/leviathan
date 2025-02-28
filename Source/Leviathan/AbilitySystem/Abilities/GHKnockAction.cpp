@@ -1,17 +1,8 @@
-﻿// Copyright Relink Games, Inc. All Rights Reserved. 
-
-
-#include "GHKnockAction.h"
-
-#include "Abilities/Tasks/AbilityTask_ApplyRootMotionConstantForce.h"
+﻿#include "GHKnockAction.h"
 #include "Leviathan/AbilitySystem/AbilityTask/GHAbilityTaskApplyRootMotionConstantForce.h"
 #include "Leviathan/Animation/GHAnimationLib.h"
 #include "../../GHComponents/SkillKnockComponent.h"
-
-UGHKnockAction::UGHKnockAction(const FObjectInitializer& object_initializer)
-	: Super(object_initializer)
-{
-}
+#include "Leviathan/Log/GHLog.h"
 
 const FFloatCurve* UGHKnockAction::FindHitRecoverCurve(const FGameplayTag& montage_tag, const FName& curve_name)
 {
@@ -20,8 +11,6 @@ const FFloatCurve* UGHKnockAction::FindHitRecoverCurve(const FGameplayTag& monta
 		check(montage_info->AnimMontage);
 		for (const FFloatCurve& float_curve : montage_info->AnimMontage->GetCurveData().FloatCurves)
 		{
-			// TODO: 下面的方法需要验证
-			//if (float_curve.Name.DisplayName == curve_name)
 			if (float_curve.GetName() == curve_name)
 			{
 				return &float_curve;

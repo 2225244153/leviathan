@@ -9,6 +9,7 @@
 #include "Leviathan/Animation/GHAnimationLib.h"
 #include "GHBaseCharacter.generated.h"
 
+class USkillKnockComponent;
 class UGHAnimationLib;
 
 UCLASS()
@@ -45,6 +46,9 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	UGHAbilitySystemComponent* AbilitySystemComponent;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Knock")
+	USkillKnockComponent* SkillKnockComponent;
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Unreliable, WithValidation)
 	void NetMulticast_PlayAnimMontage(UAnimMontage* montage);

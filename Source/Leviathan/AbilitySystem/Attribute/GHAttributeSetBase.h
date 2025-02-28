@@ -1,5 +1,4 @@
-﻿
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
@@ -21,10 +20,11 @@ if (!FMath::IsNearlyEqual(value, Get##PropertyName()))	Set##PropertyName(value);
  *  属性集基础类.
  */
 UCLASS(Blueprintable, BlueprintType)
-class LEVIATHAN_API UGHAttributeSetBase : public UAttributeSet {
+class LEVIATHAN_API UGHAttributeSetBase : public UAttributeSet
+{
 	GENERATED_BODY()
+
 public:
-	
 	/**
 	 * @brief 
 	 * @return 
@@ -45,7 +45,8 @@ public:
 	 * @param new_max_value 
 	 * @param max_attribute_data 
 	 */
-	void ScaleAttributeWithMax(const FGameplayAttributeData &attribute_data ,const FGameplayAttribute &attribute ,float new_max_value ,const FGameplayAttributeData &max_attribute_data) const;
+	void ScaleAttributeWithMax(const FGameplayAttributeData& attribute_data, const FGameplayAttribute& attribute,
+	                           float new_max_value, const FGameplayAttributeData& max_attribute_data) const;
 
 	/**
 	 * @brief 调整最大值时根据当前值与最大之的比例进行调整。
@@ -54,7 +55,8 @@ public:
 	 * @param old_value 
 	 * @param new_value 
 	 */
-	void ScaleAttributeWithMax(const FGameplayAttributeData &attribute_data ,const FGameplayAttribute &attribute ,float old_value ,float new_value) const;
+	void ScaleAttributeWithMax(const FGameplayAttributeData& attribute_data, const FGameplayAttribute& attribute,
+	                           float old_value, float new_value) const;
 
 	/**
 	 * @brief 限制属性值的范围
@@ -64,7 +66,8 @@ public:
 	 * @param max_value 
 	 * @return 
 	 */
-	float ClampAttribute(FGameplayAttributeData& attribute_data, float new_value, float min_value, float max_value) const;
+	float ClampAttribute(FGameplayAttributeData& attribute_data, float new_value, float min_value,
+	                     float max_value) const;
 };
 
 /**
@@ -75,6 +78,7 @@ UCLASS(BlueprintType)
 class UGHAttributeSetDesc : public UDataAsset
 {
 	GENERATED_BODY()
+
 public:
 	/**
 	 * @brief 属性集合
@@ -93,27 +97,39 @@ UCLASS(BlueprintType)
 class LEVIATHAN_API UGHHealthAttributeSet : public UGHAttributeSetBase
 {
 	GENERATED_BODY()
+
 public:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	/**
      * @brief 当前血量
      */
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRepHealth)
-    FGameplayAttributeData Health;
-    ATTRIBUTE_ACCESSORS(UGHHealthAttributeSet, Health)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRepHealth)
+	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS(UGHHealthAttributeSet, Health)
+
+	/**
+     * @brief 最大血量
+     */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRepMaxHealth)
+	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS(UGHHealthAttributeSet, MaxHealth)
 
 	UFUNCTION()
-	void OnRepHealth(const FGameplayAttributeData &old_value);
+	void OnRepHealth(const FGameplayAttributeData& old_value);
+	
+	UFUNCTION()
+    void OnRepMaxHealth(const FGameplayAttributeData& old_value);
 };
 
 UCLASS(BlueprintType)
 class LEVIATHAN_API UGHAttackAttributeSet : public UGHAttributeSetBase
 {
 	GENERATED_BODY()
+
 public:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/**
 	 * @brief 当前攻击力
