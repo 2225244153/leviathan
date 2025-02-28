@@ -1,5 +1,4 @@
-﻿// Copyright Relink Games, Inc. All Rights Reserved. 
-
+﻿
 
 #include "GHAttributeSetBase.h"
 

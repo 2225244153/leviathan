@@ -6,10 +6,13 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Leviathan/AbilitySystem/Component/GHAbilitySystemComponent.h"
+#include "Leviathan/Animation/GHAnimationLib.h"
 #include "GHBaseCharacter.generated.h"
 
+class UGHAnimationLib;
+
 UCLASS()
-class LEVIATHAN_API AGHBaseCharacter : public ACharacter,public IAbilitySystemInterface
+class LEVIATHAN_API AGHBaseCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -35,6 +38,8 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
+	virtual FGHAnimMontageInfo* GetAnimMontageInfo(FGameplayTag GameplayTag) const;
+
 	/**
 	 * @brief ASC组件
 	 */
@@ -53,5 +58,9 @@ private:
 	static int32 IDFlag;
 
 	UPROPERTY(Replicated)
-	int32 ID; //唯一id，标识一个Character
+	int32 ID;//唯一id，标识一个Character
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UGHAnimationLib> AnimationLib;
 };

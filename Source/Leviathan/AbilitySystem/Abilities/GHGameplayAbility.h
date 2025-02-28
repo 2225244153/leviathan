@@ -1,10 +1,27 @@
-// Copyright Relink Games, Inc. All Rights Reserved. 
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "Leviathan/AbilitySystem/TargetActor/GHTargetActor.h"
 #include "GHGameplayAbility.generated.h"
+
+USTRUCT(BlueprintType)
+struct FGHGameplayEffectContainer
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<AGHTargetActor> TargetActor;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TEnumAsByte<EGameplayTargetingConfirmation::Type> ConfirmationType;
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+	TArray<TSubclassOf<UGameplayEffect>> TargetGameplayEffects;
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+    TArray<TSubclassOf<UGameplayEffect>> SelfGameplayEffects;
+};
 
 class UGHAbilitySystemComponent;
 
@@ -37,25 +54,13 @@ public:
 	void OnAbilityFailedToActivate(const FGameplayTagContainer& FailureReason) const;
 
 public:
-	/**
-	 * @brief 当目标赋予Ability时的事件
-	 * @param ActorInfo 
-	 * @param AbilitySpec 
-	 */
-	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo,
-	                           const FGameplayAbilitySpec& AbilitySpec) override;
-
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                             const FGameplayAbilityActivationInfo ActivationInfo,
 	                             const FGameplayEventData* TriggerEventData) override;
-	
+
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                        const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility,
 	                        bool bWasCancelled) override;
-
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
-
-	
 
 protected:
 	/**
@@ -67,9 +72,14 @@ protected:
 
 	void EndCurrentAbility(bool is_replicate_end_ability, bool is_was_cancelled);
 
-private:
-	FDelegateHandle HandleEventApplyEffectContainerDelegate;
-	FDelegateHandle HandleEventRemoveEffectContainerDelegate;
+	UFUNCTION(BlueprintCallable)
+	bool IsServer();
+
+	/**
+     * @brief 指示器类型
+     */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillBase StaticInfo")
+	TEnumAsByte<EGameplayTargetingConfirmation::Type> TargetingConfirmation;
 };
 
 /**

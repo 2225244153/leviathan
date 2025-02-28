@@ -1,4 +1,3 @@
-// Copyright Relink Games, Inc. All Rights Reserved. 
 
 #pragma once
 #include "../Abilities/GHAbilityInfo.h"

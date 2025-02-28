@@ -22,7 +22,7 @@ AGHBaseCharacter::AGHBaseCharacter()
 	// Ability System Component.
 	AbilitySystemComponent = CreateDefaultSubobject<UGHAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 }
 
 // Called when the game starts or when spawned
@@ -60,6 +60,18 @@ UAbilitySystemComponent* AGHBaseCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+FGHAnimMontageInfo* AGHBaseCharacter::GetAnimMontageInfo(FGameplayTag GameplayTag) const
+{
+	if (!AnimationLib)
+	{
+		ensureMsgf(false, TEXT("缺少 AnimationLib配置！"));
+		return nullptr;
+	}
+
+	FGHAnimMontageInfo* montage_info = AnimationLib->AnimMontages.Find(GameplayTag);
+	return montage_info;
+}
+
 bool AGHBaseCharacter::NetMulticast_PlayAnimMontage_Validate(UAnimMontage* montage)
 {
 	return montage->IsValidLowLevelFast();
@@ -90,6 +102,6 @@ void AGHBaseCharacter::InitAbilitySystemComponent(AActor* OwnerActor)
 		AbilitySystemComponent->InitAttributeSet();
 		AbilitySystemComponent->InitAbility();
 	}
-	
+
 	ASCInitialized = true;
 }

@@ -1,4 +1,3 @@
-// Copyright Relink Games, Inc. All Rights Reserved. 
 
 
 #include "GHGameplayTags.h"
@@ -14,6 +13,7 @@ void FGHGameplayTags::InitNativeTags()
 	GH_DEFINE_GAMEPLAY_TAG_COMMENT(Character, "Character", "角色Tag");
 	GH_DEFINE_GAMEPLAY_TAG_COMMENT(CoolDown, "CoolDown", "冷却Tag");
 	GH_DEFINE_GAMEPLAY_TAG_COMMENT(Input, "Input", "输入");
+	GH_DEFINE_GAMEPLAY_TAG_COMMENT(Anim, "Anim", "动画");
 }
 
 FGHGameplayTags::FGHGameplayTags()

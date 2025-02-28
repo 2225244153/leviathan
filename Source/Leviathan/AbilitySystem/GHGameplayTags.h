@@ -1,4 +1,3 @@
-// Copyright Relink Games, Inc. All Rights Reserved. 
 
 #pragma once
 
@@ -22,6 +21,7 @@ struct LEVIATHAN_API FGHGameplayTags
 	FGameplayTag Character;
 	FGameplayTag CoolDown;
 	FGameplayTag Input;
+	FGameplayTag Anim;
 
 	void InitNativeTags();
 

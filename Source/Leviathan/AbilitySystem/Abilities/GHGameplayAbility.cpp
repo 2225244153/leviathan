@@ -1,6 +1,3 @@
-// Copyright Relink Games, Inc. All Rights Reserved. 
-
-
 #include "GHGameplayAbility.h"
 #include "Leviathan/AbilitySystem/Component/GHAbilitySystemComponent.h"
 #include "Leviathan/GHGameFrameWork/GHBaseCharacter.h"
@@ -9,7 +6,7 @@
 DEFINE_LOG_CATEGORY(LogGHGameplayAbility)
 
 UGHGameplayAbility::UGHGameplayAbility(const FObjectInitializer& ObjectInitializer)
-	:Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateNo;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -19,7 +16,9 @@ UGHGameplayAbility::UGHGameplayAbility(const FObjectInitializer& ObjectInitializ
 
 UGHAbilitySystemComponent* UGHGameplayAbility::GetAbilitySystemComponentFromActorInfo() const
 {
-	return (CurrentActorInfo ? Cast<UGHAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()): nullptr);
+	return (CurrentActorInfo
+		        ? Cast<UGHAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get())
+		        : nullptr);
 }
 
 void UGHGameplayAbility::OnAbilityFailedToActivate(const FGameplayTagContainer& FailureReason) const
@@ -27,14 +26,10 @@ void UGHGameplayAbility::OnAbilityFailedToActivate(const FGameplayTagContainer& 
 	ScriptOnAbilityFailedToActivate(FailureReason);
 }
 
-void UGHGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& AbilitySpec)
-{
-	Super::OnGiveAbility(ActorInfo, AbilitySpec);
-}
-
 void UGHGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-                                             const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-                                             const FGameplayEventData* TriggerEventData)
+                                         const FGameplayAbilityActorInfo* ActorInfo,
+                                         const FGameplayAbilityActivationInfo ActivationInfo,
+                                         const FGameplayEventData* TriggerEventData)
 {
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
@@ -44,16 +39,17 @@ void UGHGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		return;
 	}
 
-	UE_LOG(LogGHGameplayAbility,Log,TEXT("技能激活: 技能:%s"),*GetName());
-	
+	UE_LOG(LogGHGameplayAbility, Log, TEXT("技能激活: 技能:%s"), *GetName());
+
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UGHGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility, bool bWasCancelled)
+                                    const FGameplayAbilityActorInfo* ActorInfo,
+                                    const FGameplayAbilityActivationInfo ActivationInfo,
+                                    bool bReplicateEndAbility, bool bWasCancelled)
 {
-	UE_LOG(LogGHGameplayAbility,Log,TEXT("技能结束: 技能:%s 是否被强制打断:%d"),*GetName(),bWasCancelled);
+	UE_LOG(LogGHGameplayAbility, Log, TEXT("技能结束: 技能:%s 是否被强制打断:%d"), *GetName(), bWasCancelled);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
@@ -65,17 +61,21 @@ void UGHGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	}
 }
 
-bool UGHGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags,
-	const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
-{
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
-}
-
 void UGHGameplayAbility::EndCurrentAbility(bool is_replicate_end_ability, bool is_was_cancelled)
 {
 	if (IsActive())
 	{
-		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), is_replicate_end_ability, is_was_cancelled);
+		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(),
+		           is_replicate_end_ability, is_was_cancelled);
 	}
+}
+
+bool UGHGameplayAbility::IsServer()
+{
+	AActor* Actor = GetAvatarActorFromActorInfo();
+	if (Actor)
+	{
+		return Actor->HasAuthority();
+	}
+	return false;
 }

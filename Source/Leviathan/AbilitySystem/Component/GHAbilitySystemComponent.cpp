@@ -1,4 +1,3 @@
-// Copyright Relink Games, Inc. All Rights Reserved. 
 
 
 #include "GHAbilitySystemComponent.h"
@@ -94,8 +93,7 @@ void UGHAbilitySystemComponent::InitAttributeSetDefaultValue(UGHAttributeSetDesc
 
 			DefaultAttModifierInfo.Attribute = pair.Key;
 			DefaultAttModifierInfo.ModifierOp = EGameplayModOp::Override;
-
-
+			
 			FScalableFloat GEFloatScalar = pair.Value;
 			DefaultAttModifierInfo.ModifierMagnitude = GEFloatScalar;
 			GE->Modifiers.Add(DefaultAttModifierInfo);
