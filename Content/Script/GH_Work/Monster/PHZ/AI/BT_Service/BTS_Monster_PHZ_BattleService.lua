@@ -10,15 +10,6 @@ require "UnLua"
 local BTS_Monster_PHZ_BattleService = Class()
 
 function BTS_Monster_PHZ_BattleService:ReceiveActivationAI(OwnerController, ControlledPawn)
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, self.Target)
-end
-
-function BTS_Monster_PHZ_BattleService:ReceiveDeactivationAI(OwnerController, ControlledPawn)
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, nil)
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, 0)
-end
-
-function BTS_Monster_PHZ_BattleService:ReceiveSearchStartAI(OwnerController, ControlledPawn)
     self.Monster = ControlledPawn
     self.Target = ControlledPawn:GetBattleTarget()
 
@@ -28,6 +19,17 @@ function BTS_Monster_PHZ_BattleService:ReceiveSearchStartAI(OwnerController, Con
     --进入战斗状态后根据权重获取可用技能
     self:GetUsableSkillID()
     self:CheckBattleState()
+    UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, self.Target)
+end
+
+function BTS_Monster_PHZ_BattleService:ReceiveDeactivationAI(OwnerController, ControlledPawn)
+    UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, nil)
+    UE4.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, 0)
+    self.SkillID = 0
+end
+
+function BTS_Monster_PHZ_BattleService:ReceiveSearchStartAI(OwnerController, ControlledPawn)
+    
 end
 
 function BTS_Monster_PHZ_BattleService:ReceiveTickAI(OwnerController, ControlledPawn, DeltaSeconds)
