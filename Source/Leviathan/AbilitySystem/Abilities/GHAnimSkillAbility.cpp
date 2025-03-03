@@ -16,6 +16,7 @@ void UGHAnimSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
                                           const FGameplayAbilityActivationInfo ActivationInfo,
                                           const FGameplayEventData* TriggerEventData)
 {
+	LOG_INFO("Actor:%s  激活技能：%s", *GetAvatarActorFromActorInfo()->GetName(), *GetName());
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	WaitHandleDamage();
@@ -41,25 +42,6 @@ void UGHAnimSkillAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	EndAnimMontagePlayer(AnimBeforeMontagePlayer);
 }
 
-UGHAbilityTaskPlayMontageAndWait* UGHAnimSkillAbility::CreateMontagePlayer(
-	const FGameplayTag& montage_tag, float play_rate, FName start_section, bool stop_when_ability_end,
-	float root_motion_translation_scale, float start_seconds)
-{
-	FGHAnimMontageInfo* anim_montage_info = GetAnimMontageInfo(montage_tag);
-	if (anim_montage_info == nullptr)
-	{
-		LOG_ERROR("找不到蒙太奇动画 ：%s", *montage_tag.ToString());
-		return nullptr;
-	}
-
-	UGHAbilityTaskPlayMontageAndWait* montage_player =
-		UGHAbilityTaskPlayMontageAndWait::CreateGHPlayMontageAndWaitProxy(
-			this, "PlayMontageTask", anim_montage_info->AnimMontage, play_rate * anim_montage_info->PlayRate,
-			start_section, stop_when_ability_end, root_motion_translation_scale, start_seconds);
-
-	return montage_player;
-}
-
 FGHAnimMontageInfo* UGHAnimSkillAbility::GetAnimMontageInfo(const FGameplayTag& montage_tag)
 {
 	if (AGHBaseCharacter* character = Cast<AGHBaseCharacter>(
@@ -81,7 +63,6 @@ void UGHAnimSkillAbility::ActiveTargetActor(TSubclassOf<AGHTargetActor> target_a
 void UGHAnimSkillAbility::SpawnAndWaitTargetData(TEnumAsByte<EGameplayTargetingConfirmation::Type> confirmation_type,
                                                  TSubclassOf<AGHTargetActor> target_actor_class)
 {
-	LOG_INFO("SpawnAndWaitTargetData...");
 	CurrentTargetDataTask = UAbilityTask_WaitTargetData::WaitTargetData(this, "Targeting", confirmation_type,
 	                                                                    target_actor_class);
 
@@ -90,7 +71,7 @@ void UGHAnimSkillAbility::SpawnAndWaitTargetData(TEnumAsByte<EGameplayTargetingC
 
 	AGameplayAbilityTargetActor* ability_target_actor;
 
-	if (CurrentTargetDataTask->BeginSpawningActor(this, TargetActorClass, ability_target_actor))
+	if (CurrentTargetDataTask->BeginSpawningActor(this, target_actor_class, ability_target_actor))
 	{
 		CurrentTargetDataTask->FinishSpawningActor(this, ability_target_actor);
 		CurrentTargetActor = Cast<AGHTargetActor>(ability_target_actor);
@@ -221,15 +202,16 @@ bool UGHAnimSkillAbility::InitAnimMontagePlayer(FGHAnimSkillMontagePlayer& anim_
 	CurrentMontagePlayer = &anim_skill_montage_player;
 
 	EndAnimMontagePlayer(anim_skill_montage_player);
-	
+
 	// 设置当前的动作蒙太奇tag
 	CurrentActionMontageTag = anim_skill_montage_player.ActionMontageTag;
+	UAnimMontage* Montage = Cast<UAnimMontage>(montage_info->AnimMontage.LoadSynchronous());
 
 	// 创建蒙太奇播放器	
 	anim_skill_montage_player.ActionMontagePlayer =
 		UGHAbilityTaskPlayMontageAndWait::CreateGHPlayMontageAndWaitProxy(
 			this, anim_skill_montage_player.ActionMontageTag.GetTagName(),
-			montage_info->AnimMontage,
+			Montage,
 			montage_info->PlayRate * anim_skill_montage_player.PlayMontageRate,
 			NAME_None,
 			anim_skill_montage_player.StopWhenAbilityEnd,

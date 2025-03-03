@@ -111,7 +111,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Attribute")
 	TObjectPtr<UGHAttributeSetDesc> AttributeSetDefault;
 
-	//输入与技能对应的部分
+	/*
+	 * 输入与技能对应的部分
+	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="")
 	FInputActionAbilityMap AbilityMap;
 

@@ -98,6 +98,10 @@ void UGHAbilitySystemComponent::InitAttributeSetDefaultValue(UGHAttributeSetDesc
 			DefaultAttModifierInfo.ModifierMagnitude = GEFloatScalar;
 			GE->Modifiers.Add(DefaultAttModifierInfo);
 		}
+		else
+		{
+			ensureMsgf(false,TEXT("未正确添加此属性所对应的属性集"));
+		}
 	}
 
 	ApplyGameplayEffectToSelf(GE, 1.f, MakeEffectContext());

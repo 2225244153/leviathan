@@ -27,9 +27,6 @@ public:
 	int32 Weight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> AnimPath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Distance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

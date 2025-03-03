@@ -16,7 +16,6 @@ class LEVIATHAN_API UGHKnockAction : public UGHAnimSkillAbility
 	GENERATED_BODY()
 
 public:
-	const FFloatCurve* FindHitRecoverCurve(const FGameplayTag& montage_tag, const FName& curve_name);
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                             const FGameplayAbilityActivationInfo ActivationInfo,

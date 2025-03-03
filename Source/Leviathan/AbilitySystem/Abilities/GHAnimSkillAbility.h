@@ -65,21 +65,6 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                        const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility,
 	                        bool bWasCancelled) override;
-	
-	/**
-	 * @brief 创建一个简单的蒙太奇播放器
-	 * @param montage_tag 
-	 * @param play_rate 
-	 * @param start_section 
-	 * @param stop_when_ability_end 
-	 * @param root_motion_translation_scale 
-	 * @param start_seconds 
-	 * @return 返回蒙太奇播放器
-	 */
-	virtual UGHAbilityTaskPlayMontageAndWait* CreateMontagePlayer(const FGameplayTag& montage_tag, float play_rate,
-	                                                              FName start_section, bool stop_when_ability_end,
-	                                                              float root_motion_translation_scale,
-	                                                              float start_seconds);
 
 	FGHAnimMontageInfo* GetAnimMontageInfo(const FGameplayTag& montage_tag);
 
@@ -111,13 +96,7 @@ public:
 
 protected:
 	void WaitHandleDamage();
-
-	/*
-	 * 技能指示器
-	 */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Anim")
-	TSubclassOf<AGHTargetActor> TargetActorClass;
-
+	
 	/**
 	 * @brief 
 	 */
@@ -135,6 +114,9 @@ protected:
 	 */
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "Template Data")
 	UAbilityTask_WaitTargetData* CurrentTargetDataTask;
+	
+	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+	TMap<FGameplayTag, FGHGameplayEffectContainer> EffectContainerMap;
 
 	/**
 	 * @brief 当前正在播放的蒙太奇
@@ -142,9 +124,6 @@ protected:
 	FGameplayTag CurrentActionMontageTag;
 
 	FGameplayEventData PayLoad;
-
-	UPROPERTY(BlueprintReadOnly,EditAnywhere)
-	TMap<FGameplayTag, FGHGameplayEffectContainer> EffectContainerMap;
 
 	FGHAnimSkillMontagePlayer* CurrentMontagePlayer;
 };

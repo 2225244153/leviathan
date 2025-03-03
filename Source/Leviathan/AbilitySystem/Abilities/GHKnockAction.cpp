@@ -2,24 +2,6 @@
 #include "Leviathan/AbilitySystem/AbilityTask/GHAbilityTaskApplyRootMotionConstantForce.h"
 #include "Leviathan/Animation/GHAnimationLib.h"
 #include "../../GHComponents/SkillKnockComponent.h"
-#include "Leviathan/Log/GHLog.h"
-
-const FFloatCurve* UGHKnockAction::FindHitRecoverCurve(const FGameplayTag& montage_tag, const FName& curve_name)
-{
-	if (FGHAnimMontageInfo* montage_info = GetAnimMontageInfo(montage_tag))
-	{
-		check(montage_info->AnimMontage);
-		for (const FFloatCurve& float_curve : montage_info->AnimMontage->GetCurveData().FloatCurves)
-		{
-			if (float_curve.GetName() == curve_name)
-			{
-				return &float_curve;
-			}
-		}
-	}
-
-	return nullptr;
-}
 
 void UGHKnockAction::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                      const FGameplayAbilityActorInfo* ActorInfo,
@@ -29,21 +11,29 @@ void UGHKnockAction::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	const FKnockInfo& knock_info = GetKnockComponent()->CurrentKnockInfo;
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+
 	if (knock_info.bForceMove)
 	{
 		//强制位移
 		if (FGHAnimMontageInfo* montage_info = GetAnimMontageInfo(AnimBeforeMontagePlayer.ActionMontageTag))
 		{
-			ApplyRootMotionConstantForceTask = UGHAbilityTaskApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
-				this, "Knock", knock_info.KnockForceMoveInfo.Direction,
-				knock_info.KnockForceMoveInfo.Strength,
-				montage_info->AnimMontage->GetPlayLength() / montage_info->PlayRate,
-				knock_info.KnockForceMoveInfo.IsAdditive, knock_info.KnockForceMoveInfo.AnimCurveForStrengthName,
-				AnimBeforeMontagePlayer.ActionMontageTag, knock_info.KnockForceMoveInfo.VelocityOnFinishMode,
-				knock_info.KnockForceMoveInfo.SetVelocityOnFinish, knock_info.KnockForceMoveInfo.ClampVelocityOnFinish,
-				knock_info.KnockForceMoveInfo.EnableGravity);
+			UAnimMontage* Montage = Cast<UAnimMontage>(montage_info->AnimMontage.LoadSynchronous());
+			if (Montage)
+			{
+				ApplyRootMotionConstantForceTask =
+					UGHAbilityTaskApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+						this, "Knock", knock_info.KnockForceMoveInfo.Direction,
+						knock_info.KnockForceMoveInfo.Strength,
+						Montage->GetPlayLength() / montage_info->PlayRate,
+						knock_info.KnockForceMoveInfo.IsAdditive,
+						knock_info.KnockForceMoveInfo.AnimCurveForStrengthName,
+						AnimBeforeMontagePlayer.ActionMontageTag, knock_info.KnockForceMoveInfo.VelocityOnFinishMode,
+						knock_info.KnockForceMoveInfo.SetVelocityOnFinish,
+						knock_info.KnockForceMoveInfo.ClampVelocityOnFinish,
+						knock_info.KnockForceMoveInfo.EnableGravity);
 
-			ApplyRootMotionConstantForceTask->ReadyForActivation();
+				ApplyRootMotionConstantForceTask->ReadyForActivation();
+			}
 		}
 	}
 }

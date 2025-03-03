@@ -16,7 +16,7 @@ struct FGHAnimMontageInfo
 	 * @brief 
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Montage")
-	TObjectPtr<UAnimMontage> AnimMontage;
+	TSoftObjectPtr<UAnimMontage> AnimMontage;
 
 	/**
 	 * @brief 
