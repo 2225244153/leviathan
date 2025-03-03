@@ -2,7 +2,6 @@
 
 #include "GHAbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
-#include "GameplayCueManager.h"
 #include "Leviathan/AbilitySystem/Abilities/GHGameplayAbility.h"
 #include "Leviathan/AbilitySystem/Attribute/GHAttributeSetBase.h"
 #include "Leviathan/GHUtils/SkillUtils.h"
@@ -10,7 +9,6 @@
 #include "Net/UnrealNetwork.h"
 
 #define LOCTEXT_NAMESPACE "GHAbilitySystemComponent"
-DEFINE_LOG_CATEGORY(LogGHAbilitySystemComponent)
 
 void UGHAbilitySystemComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -127,23 +125,6 @@ TArray<int32> UGHAbilitySystemComponent::GetUsableAbilities()
 	}
 
 	return SkillIDs;
-}
-
-void UGHAbilitySystemComponent::K2_ExecuteGameplayCue(const FGameplayTag GameplayCueTag,
-                                                      const FGameplayCueParameters& GameplayCueParameters)
-{
-	ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
-}
-
-void UGHAbilitySystemComponent::K2_AddGameplayCue(const FGameplayTag GameplayCueTag,
-                                                  const FGameplayCueParameters& GameplayCueParameters)
-{
-	AddGameplayCue(GameplayCueTag, GameplayCueParameters);
-}
-
-void UGHAbilitySystemComponent::K2_RemoveGameplayCue(const FGameplayTag GameplayCueTag)
-{
-	RemoveGameplayCue(GameplayCueTag);
 }
 
 bool UGHAbilitySystemComponent::TryActivateSkill(int32 SkillID)
