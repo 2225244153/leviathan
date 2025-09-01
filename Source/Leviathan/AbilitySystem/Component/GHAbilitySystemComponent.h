@@ -26,6 +26,8 @@ struct FGHAbilityDesc
 	FGameplayAbilitySpecHandle AbilitySpecHandle;
 };
 
+DECLARE_LOG_CATEGORY_EXTERN(LogGHAbilitySystemComponent, Log, All)
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LEVIATHAN_API UGHAbilitySystemComponent : public UAbilitySystemComponent
 {
@@ -56,6 +58,23 @@ public:
 	 */
 	UFUNCTION(BlueprintPure)
 	TArray<int32> GetUsableAbilities();
+
+	UFUNCTION(BlueprintCallable, Category = "GameplayCue", DisplayName = "ExecuteGameplayCue",
+		Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
+	void K2_ExecuteGameplayCue(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
+
+	/**
+	 * @brief 
+	 * @param GameplayCueTag 
+	 * @param GameplayCueParameters 
+	 */
+	UFUNCTION(BlueprintCallable, Category = "GameplayCue", DisplayName = "AddGameplayCue",
+		Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
+	void K2_AddGameplayCue(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
+
+	UFUNCTION(BlueprintCallable, Category = "GameplayCue", DisplayName = "RemoveGameplayCue",
+		Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
+	void K2_RemoveGameplayCue(const FGameplayTag GameplayCueTag);
 
 	UFUNCTION(BlueprintCallable)
 	bool TryActivateSkill(int32 SkillID);
