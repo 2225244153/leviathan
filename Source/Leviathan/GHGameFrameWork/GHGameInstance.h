@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "GHGameInstace.generated.h"
+#include "GHGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LEVIATHAN_API UGHGameInstace : public UGameInstance
+class LEVIATHAN_API UGHGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
 public:
-	UGHGameInstace();
-	~UGHGameInstace();
+	UGHGameInstance();
+	~UGHGameInstance();
 
 	void GHInit();
 

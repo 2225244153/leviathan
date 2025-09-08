@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GHGameInstace.h"
+#include "GHGameInstance.h"
 
 #include "GHBaseAIController.h"
 #include "GHBaseMonster.h"
@@ -14,15 +14,15 @@
 #include "Leviathan/GHManagers/GHCoreDelegatesMgr.h"
 #include "Leviathan/GHUtils/SkillUtils.h"
 
-UGHGameInstace::UGHGameInstace()
+UGHGameInstance::UGHGameInstance()
 {
 }
 
-UGHGameInstace::~UGHGameInstace()
+UGHGameInstance::~UGHGameInstance()
 {
 }
 
-void UGHGameInstace::GHInit()
+void UGHGameInstance::GHInit()
 {
 	CharacterMgr = GetSubsystem<UGHCharacterMgr>(this);
 	if (CharacterMgr != nullptr)
@@ -33,18 +33,18 @@ void UGHGameInstace::GHInit()
 	
 	if (GetWorld()->IsNetMode(NM_Client))
 	{
-		GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &UGHGameInstace::TickTimer, 0.02, true);
+		GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &UGHGameInstance::TickTimer, 0.02, true);
 	}
 }
 
-void UGHGameInstace::StartGameInstance()
+void UGHGameInstance::StartGameInstance()
 {
 	GHInit();
 	
 	Super::StartGameInstance();
 }
 
-void UGHGameInstace::Shutdown()
+void UGHGameInstance::Shutdown()
 {
 	if (CoreDelegatesMgr != nullptr)
 	{
@@ -60,7 +60,7 @@ void UGHGameInstace::Shutdown()
 }
 
 #if WITH_EDITOR
-FGameInstancePIEResult UGHGameInstace::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params)
+FGameInstancePIEResult UGHGameInstance::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params)
 {
 	GHInit();
 	FGameInstancePIEResult result = Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
@@ -68,7 +68,7 @@ FGameInstancePIEResult UGHGameInstace::StartPlayInEditorGameInstance(ULocalPlaye
 }
 #endif
 
-void UGHGameInstace::TickTimer()
+void UGHGameInstance::TickTimer()
 {
 	if (bDebugTargetRange || bDebugAIPurse || bDebugBornRange)
 	{
@@ -100,7 +100,7 @@ void UGHGameInstace::TickTimer()
 	}
 }
 
-void UGHGameInstace::GHDebugAIMonster(int32 type, int32 active)
+void UGHGameInstance::GHDebugAIMonster(int32 type, int32 active)
 {
 	switch (type)
 	{

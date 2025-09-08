@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Leviathan/GHGameFrameWork/GHGameInstace.h"
+#include "Leviathan/GHGameFrameWork/GHGameInstance.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GHCharacterMgr.generated.h"
 

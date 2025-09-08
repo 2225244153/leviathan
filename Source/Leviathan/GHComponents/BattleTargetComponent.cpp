@@ -33,7 +33,7 @@ void UBattleTargetComponent::BeginPlay()
 
 	EXECUTE_ON_SERVER
 	{
-		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 		coreDelegatesMgr->OnAIStateChanged.AddUniqueDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
 		coreDelegatesMgr->OnCharacterHurt.AddUniqueDynamic(this, &UBattleTargetComponent::OnHurt);
 	}
@@ -43,7 +43,7 @@ void UBattleTargetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	EXECUTE_ON_SERVER
 	{
-		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 		coreDelegatesMgr->OnAIStateChanged.RemoveDynamic(this, &UBattleTargetComponent::OnAIStateChanged);
 		coreDelegatesMgr->OnCharacterHurt.RemoveDynamic(this, &UBattleTargetComponent::OnHurt);
 	}
@@ -117,7 +117,7 @@ void UBattleTargetComponent::OnHurt(int32 sponsorId, int32 targetId)
 	{
 		return;
 	}
-	UGHCharacterMgr* characterMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CharacterMgr;
+	UGHCharacterMgr* characterMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CharacterMgr;
 	AGHBaseCharacter* sponsor = characterMgr->GetCharacter(sponsorId);
 	if (sponsor != nullptr)
 	{
@@ -149,7 +149,7 @@ void UBattleTargetComponent::SetBattleTarget(AGHBaseCharacter* target)
 	}
 	BattleTarget = target;
 
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 	coreDelegatesMgr->OnBattleSearchTarget.Execute(BattleTarget->GetID());
 }
 
@@ -166,7 +166,7 @@ void UBattleTargetComponent::LoseBattleTarget(ELoseTargetType loseType)
 	
 	BattleTarget = nullptr;
 
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 	coreDelegatesMgr->OnBattleLoseTarget.Execute(loseType);
 }
 
@@ -183,7 +183,7 @@ void UBattleTargetComponent::SearchBattleTarget()
 	}
 
 	TArray<AGHBasePlayer*> allPlayers;
-	UGHCharacterMgr* characterMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CharacterMgr;
+	UGHCharacterMgr* characterMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CharacterMgr;
 	characterMgr->GetAllPlayers(allPlayers);
 	AGHBasePlayer* tempTarget = nullptr;
 	AGHBasePlayer* tempAlertTarget = nullptr;
@@ -259,7 +259,7 @@ void UBattleTargetComponent::StartAlert()
 	}
 	bAlert = true;
 	
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 	coreDelegatesMgr->OnStartAlert.ExecuteIfBound();
 }
 
@@ -272,7 +272,7 @@ void UBattleTargetComponent::FinishAlert()
 	if (CurAlertValue < 0 && AlertTarget == nullptr)
 	{
 		//丢失警戒目标退出的警戒状态
-		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 		coreDelegatesMgr->OnFinishAlert.ExecuteIfBound();
 	}
 	bAlert = false;

@@ -56,7 +56,7 @@ void UGHGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	AGHBaseCharacter* owner = Cast<AGHBaseCharacter>(ActorInfo->OwnerActor);
 	if (owner != nullptr)
 	{
-		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 		coreDelegatesMgr->OnCharacterEndAbility.Broadcast(owner->GetID(), bWasCancelled);
 	}
 }

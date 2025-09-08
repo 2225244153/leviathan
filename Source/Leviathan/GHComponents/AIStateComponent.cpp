@@ -41,7 +41,7 @@ void UAIStateComponent::BeginPlay()
 
 	EXECUTE_ON_SERVER
 	{
-		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 		coreDelegatesMgr->OnBattleSearchTarget.BindUObject(this, &UAIStateComponent::OnBattleSearchTarget);
 		coreDelegatesMgr->OnBattleLoseTarget.BindUObject(this, &UAIStateComponent::OnBattleLoseTarget);
 		coreDelegatesMgr->OnStartAlert.BindUObject(this, &UAIStateComponent::OnStartAlert);
@@ -57,7 +57,7 @@ void UAIStateComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	EXECUTE_ON_SERVER
 	{
-		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+		UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
     	coreDelegatesMgr->OnBattleSearchTarget.Unbind();
     	coreDelegatesMgr->OnBattleLoseTarget.Unbind();
     	coreDelegatesMgr->OnStartAlert.Unbind();
@@ -96,7 +96,7 @@ void UAIStateComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void UAIStateComponent::OnBattleSearchTarget(int32 targetId)
 {
-	UGHCharacterMgr* characterMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CharacterMgr;
+	UGHCharacterMgr* characterMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CharacterMgr;
 	AGHBaseCharacter* target = characterMgr->GetCharacter(targetId);
 	if (target == nullptr)
 	{
@@ -177,7 +177,7 @@ void UAIStateComponent::SetState(FGameplayTag state)
 	FGameplayTag oldTag = TagState;
 	TagState = state;
 
-	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstace>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
+	UGHCoreDelegatesMgr* coreDelegatesMgr = Cast<UGHGameInstance>(GetWorld()->GetGameInstance())->CoreDelegatesMgr;
 	coreDelegatesMgr->OnAIStateChanged.Broadcast(oldTag, TagState);
 
 	if (state == AI_Monster_State_Find)

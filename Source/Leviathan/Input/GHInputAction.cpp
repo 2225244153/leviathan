@@ -9,10 +9,10 @@
 
 void FGHInputActionBinding::Init(ACharacter* Character, UEnhancedInputComponent* InEnhancedInputComponent)
 {
-	IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(Character);
+	const IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(Character);
 	check(AbilitySystemInterface);
 
-	UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
+	const UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
 	check(AbilitySystemComponent);
 
 	BindingHandle = 0;

@@ -8,7 +8,7 @@
 AGHGameModeBase::AGHGameModeBase()
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/GH_Work/Character/Default/Blueprints/BP_Player_Default"));
-	if (PlayerPawnBPClass.Class != NULL)
+	if (PlayerPawnBPClass.Class != nullptr)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
