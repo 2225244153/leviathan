@@ -10,12 +10,12 @@ require "UnLua"
 local BTS_Monster_PHZ_BattleService = Class()
 
 function BTS_Monster_PHZ_BattleService:ReceiveActivationAI(OwnerController, ControlledPawn)
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, self.Target)
+    UE.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, self.Target)
 end
 
 function BTS_Monster_PHZ_BattleService:ReceiveDeactivationAI(OwnerController, ControlledPawn)
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, nil)
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, 0)
+    UE.UBTFunctionLibrary.SetBlackboardValueAsObject(self, self.TargetKeyName, nil)
+    UE.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, 0)
     self.SkillID = 0
 end
 
@@ -52,17 +52,17 @@ function BTS_Monster_PHZ_BattleService:GetUsableSkillID()
     local usableSkillIDs = self.Monster.AbilitySystemComponent:GetUsableAbilities()
     local usableSkillIDsNum = usableSkillIDs:Num()
     if usableSkillIDsNum ~= 0 then
-        local skillsWeight = UE4.TArray(0)
+        local skillsWeight = UE.TArray(0)
         for i = 1, usableSkillIDsNum do
             local tempSkillId = usableSkillIDs:Get(i)
-            local skillData = UE4.USkillUtils.GetSkillDataBySkillID(tempSkillId)
+            local skillData = UE.USkillUtils.GetSkillDataBySkillID(tempSkillId)
             skillsWeight:Add(skillData.Weight)
         end
     
-        local index = UE4.UGHCommonUtils.RandomIntegerByWeight(skillsWeight)
+        local index = UE.UGHCommonUtils.RandomIntegerByWeight(skillsWeight)
         self.SkillID = usableSkillIDs:Get(index + 1)
     end
-    UE4.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, self.SkillID)
+    UE.UBTFunctionLibrary.SetBlackboardValueAsInt(self, self.SkillIdKeyName, self.SkillID)
 end
 
 function BTS_Monster_PHZ_BattleService:CheckBattleState()
@@ -71,15 +71,15 @@ function BTS_Monster_PHZ_BattleService:CheckBattleState()
         self.Monster.StateComponent:SetState(self.BattlePerformTag)
         return
     end
-    local skillData = UE4.USkillUtils.GetSkillDataBySkillID(self.SkillID)
+    local skillData = UE.USkillUtils.GetSkillDataBySkillID(self.SkillID)
     --2.判断距离是否足够释放技能，不够则执行追击
-    local distance = UE4.UGHCommonUtils.CalcDistance(self.Monster, self.Target)
+    local distance = UE.UGHCommonUtils.CalcDistance(self.Monster, self.Target)
     if distance > skillData.Distance then
         self.Monster.StateComponent:SetState(self.BattlePursueTag)
         return
     end
     --3.距离足够判断角度是否满足释放技能，不够则执行旋转
-    local angle = UE4.UGHCommonUtils.Calc2DAngleByForward(self.Monster, self.Target)
+    local angle = UE.UGHCommonUtils.Calc2DAngleByForward(self.Monster, self.Target)
     if angle > (skillData.Rotation / 2) then
         self.Monster.StateComponent:SetState(self.BattleTurnTag)
         return
