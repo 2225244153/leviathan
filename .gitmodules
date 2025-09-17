@@ -1,0 +1,3 @@
+[submodule "submodule_directory/Lfs"]
+	path = submodule_directory/Lfs
+	url = https://huggingface.co/datasets/HHDeXiaoHuangRen/Lfs
